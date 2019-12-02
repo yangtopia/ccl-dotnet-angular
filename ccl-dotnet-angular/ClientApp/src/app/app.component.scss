@@ -1,0 +1,13 @@
+.map {
+  height: 100vh;
+  width: 100vw;
+}
+.zoom-control {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+}
+
+.zoom-control .btn {
+  font-size: 0.75rem !important;
+}

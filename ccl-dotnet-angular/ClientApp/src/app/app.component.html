@@ -1,6 +1,21 @@
-<body>
-  <app-nav-menu></app-nav-menu>
-  <div class="container">
-    <router-outlet></router-outlet>
-  </div>
-</body>
+<app-control-panel></app-control-panel>
+<app-canvas
+  [coastLines]="coastLines"
+  [coastLinePs]="coastLinePs"
+  [roadCenterLines]="roadCenterLines"
+  [quayNames]="quayNames"
+  [roads]="roads"
+  [lotSmalls]="lotSmalls"
+  [lotMiddles]="lotMiddles"
+  [currentZoomLevel$]="currentZoomLevel$"
+  [maxZoomLevel]="MAX_ZOOM_LEVEL"
+  [minZoomLevel]="MIN_ZOOM_LEVEL"
+></app-canvas>
+<clr-button-group class="zoom-control">
+  <clr-button (click)="zoomButtonClickEvent.next(true)"
+    ><clr-icon shape="plus"></clr-icon>확대</clr-button
+  >
+  <clr-button (click)="panButtonClickEvent.next(false)"
+    ><clr-icon shape="minus"></clr-icon>축소</clr-button
+  >
+</clr-button-group>
