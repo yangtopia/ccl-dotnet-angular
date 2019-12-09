@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ccl_dotnet_angular.Repositories;
 
 namespace ccl_dotnet_angular
 {
@@ -26,6 +27,8 @@ namespace ccl_dotnet_angular
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

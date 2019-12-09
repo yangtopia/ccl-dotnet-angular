@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, Inject } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import _groupBy from 'lodash/groupBy';
 import _has from 'lodash/has';
@@ -8,6 +9,7 @@ import { scan, startWith } from 'rxjs/operators';
 import { ShipState } from 'src/store/ship.state';
 import shipyard from '../assets/json/shipyard.json';
 import { CanvasInput } from './components/canvas/canvas.component.js';
+import { Employee } from './shared/employee.interface.js';
 import { AreaGroup, LandScapeClass, Road, RoadGroup, ShipyardXML } from './shared/shipyard.interface';
 
 const SHIPYARD_XML = shipyard as ShipyardXML;
@@ -40,7 +42,11 @@ export class AppComponent {
   zoomButtonClickEvent = new Subject<boolean>();
   panButtonClickEvent = new Subject<boolean>();
 
-  constructor(private store: Store) {
+  constructor(private store: Store, @Inject('BASE_URL') baseUrl: string, http: HttpClient) {
+    // API CALL SAMPLE CODE
+    const employees$ = http.get<Employee[]>(baseUrl + 'api/employee/100');
+    employees$.subscribe(e => console.log(e));
+
     const {
       Appearance,
       Spaces: { Space }
