@@ -8,9 +8,19 @@ import { merge, Observable, Subject } from 'rxjs';
 import { scan, startWith } from 'rxjs/operators';
 import { ShipState } from 'src/store/ship.state';
 import shipyard from '../assets/json/shipyard.json';
-import { CanvasInput } from './components/canvas/canvas.component.js';
-import { Employee } from './shared/employee.interface.js';
-import { AreaGroup, LandScapeClass, Road, RoadGroup, ShipyardXML } from './shared/shipyard.interface';
+import { CanvasInput } from './components/canvas/canvas.component';
+import {
+  AreaGroup,
+  LandScapeClass,
+  Road,
+  RoadGroup,
+  ShipyardXML
+} from './shared/shipyard.interface';
+import {
+  TyphoonInfo,
+  QuayInfo,
+  QuayMooringInfo
+} from './shared/serverModel.interface';
 
 const SHIPYARD_XML = shipyard as ShipyardXML;
 
@@ -42,10 +52,21 @@ export class AppComponent {
   zoomButtonClickEvent = new Subject<boolean>();
   panButtonClickEvent = new Subject<boolean>();
 
-  constructor(private store: Store, @Inject('BASE_URL') baseUrl: string, http: HttpClient) {
-    // API CALL SAMPLE CODE
-    const employees$ = http.get<Employee[]>(baseUrl + 'api/employee/100');
-    employees$.subscribe(e => console.log(e));
+  constructor(
+    private store: Store,
+    @Inject('BASE_URL') baseUrl: string,
+    http: HttpClient
+  ) {
+    const typhoonInfos$ = http.get<TyphoonInfo[]>(`${baseUrl}api/typhoonInfo`);
+    typhoonInfos$.subscribe(t => console.log(t));
+
+    const quayInfos$ = http.get<QuayInfo[]>(`${baseUrl}api/quayInfo`);
+    quayInfos$.subscribe(q => console.log(q));
+
+    const quayMooringInfos$ = http.get<QuayMooringInfo[]>(
+      `${baseUrl}api/quayMooringInfo`
+    );
+    quayMooringInfos$.subscribe(qm => console.log(qm));
 
     const {
       Appearance,
@@ -54,16 +75,24 @@ export class AppComponent {
 
     const spaceStyledDict = _groupBy(Appearance.Space.Groups.Group, '_Name');
 
-    const areas = Space.filter(space => _has(space, 'Area')).map(space => space.Area);
+    const areas = Space.filter(space => _has(space, 'Area')).map(
+      space => space.Area
+    );
     const groupedArea = _groupBy(areas, '_Group');
 
-    const landScapes = Space.filter(space => _has(space, 'LandScape')).map(space => space.LandScape);
+    const landScapes = Space.filter(space => _has(space, 'LandScape')).map(
+      space => space.LandScape
+    );
     const groupedLandScape = _groupBy(landScapes, '_Group');
 
-    const quayNames = Space.filter(space => _has(space, 'QuayName')).map(space => space.QuayName);
+    const quayNames = Space.filter(space => _has(space, 'QuayName')).map(
+      space => space.QuayName
+    );
     const groupedQuayNames = _groupBy(quayNames, '_Group');
 
-    const roads = Space.filter(space => _has(space, 'Road')).map(space => space.Road);
+    const roads = Space.filter(space => _has(space, 'Road')).map(
+      space => space.Road
+    );
     const groupedRoad = _groupBy(roads, '_Group');
 
     const LOT_SMALL_ARR = groupedArea[AreaGroup.GIFLotsmall];
@@ -78,14 +107,35 @@ export class AppComponent {
       spaces: LOT_SMALL_ARR,
       style: _head(spaceStyledDict[AreaGroup.GIFLotsmall])
     };
-    this.lotMiddles = { spaces: LOT_MIDDLE_ARR, style: _head(spaceStyledDict[AreaGroup.GIFCoastline]) };
-    this.coastLines = { spaces: COASTLINE_ARR, style: _head(spaceStyledDict[AreaGroup.GIFCoastline]) };
-    this.coastLinePs = { spaces: COASTLINE_P_ARR, style: _head(spaceStyledDict[AreaGroup.GIFCoastlineP]) };
-    this.roads = { spaces: ROAD_ARR, style: _head(spaceStyledDict[RoadGroup.GIFRoad]) };
-    this.roadCenterLines = { spaces: ROAD_CENTER_LINE_ARR, style: _head(spaceStyledDict[RoadGroup.GIFRoadcenterline]) };
-    this.quayNames = { spaces: QUAYNAME_ARR, style: _head(spaceStyledDict[AreaGroup.GIFQuayname]) };
+    this.lotMiddles = {
+      spaces: LOT_MIDDLE_ARR,
+      style: _head(spaceStyledDict[AreaGroup.GIFCoastline])
+    };
+    this.coastLines = {
+      spaces: COASTLINE_ARR,
+      style: _head(spaceStyledDict[AreaGroup.GIFCoastline])
+    };
+    this.coastLinePs = {
+      spaces: COASTLINE_P_ARR,
+      style: _head(spaceStyledDict[AreaGroup.GIFCoastlineP])
+    };
+    this.roads = {
+      spaces: ROAD_ARR,
+      style: _head(spaceStyledDict[RoadGroup.GIFRoad])
+    };
+    this.roadCenterLines = {
+      spaces: ROAD_CENTER_LINE_ARR,
+      style: _head(spaceStyledDict[RoadGroup.GIFRoadcenterline])
+    };
+    this.quayNames = {
+      spaces: QUAYNAME_ARR,
+      style: _head(spaceStyledDict[AreaGroup.GIFQuayname])
+    };
 
-    const currentZoomLevel$ = merge(this.zoomButtonClickEvent, this.panButtonClickEvent).pipe(
+    const currentZoomLevel$ = merge(
+      this.zoomButtonClickEvent,
+      this.panButtonClickEvent
+    ).pipe(
       scan((acc: number, isZoom: boolean) => {
         if (isZoom && acc < this.MAX_ZOOM_LEVEL) {
           return acc + this.STEP_OF_ZOOM_LEVEL;

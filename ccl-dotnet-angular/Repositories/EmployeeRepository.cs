@@ -71,7 +71,7 @@ namespace ccl_dotnet_angular.Repositories
 
         public IDbConnection GetConnection()
         {
-            var connectionString = configuration.GetSection("ConnectionStrings").GetSection("EmployeeConnection").Value;
+            var connectionString = configuration.GetSection("ConnectionStrings").GetSection("oracleConnection").Value;
             var conn = new OracleConnection(connectionString);
             return conn;
         }

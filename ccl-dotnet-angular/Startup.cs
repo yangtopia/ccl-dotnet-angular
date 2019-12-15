@@ -27,7 +27,10 @@ namespace ccl_dotnet_angular
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            // services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            services.AddTransient<ITyphoonInfoRepository, TyphoonInfoRepository>();
+            services.AddTransient<IQuayInfoRepository, QuayInfoRepository>();
+            services.AddTransient<IQuayMooringInfoRepository, QuayMooringInfoRepository>();
             services.AddSingleton<IConfiguration>(Configuration);
         }
 
