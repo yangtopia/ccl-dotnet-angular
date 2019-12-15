@@ -3,7 +3,7 @@ import { fabric } from 'fabric';
 import { Canvas } from 'fabric/fabric-impl';
 import { combineLatest, fromEvent, Observable } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
-import { Coordinate, GroupStyle, LandScapeClass, Road } from 'src/app/shared/shipyard.interface';
+import { Coordinate, GroupStyle, LandScapeClass, Road } from 'src/shared/shipyard.interface';
 
 export interface CanvasInput<T> {
   spaces: T;

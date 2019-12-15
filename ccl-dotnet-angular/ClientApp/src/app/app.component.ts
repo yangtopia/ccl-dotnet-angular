@@ -1,26 +1,30 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import _groupBy from 'lodash/groupBy';
 import _has from 'lodash/has';
 import _head from 'lodash/head';
 import { merge, Observable, Subject } from 'rxjs';
 import { scan, startWith } from 'rxjs/operators';
-import { ShipState } from 'src/store/ship.state';
+import { QuayInfoState } from 'src/store/quayInfo.state';
 import shipyard from '../assets/json/shipyard.json';
-import { CanvasInput } from './components/canvas/canvas.component';
+import {
+  QuayInfo,
+  QuayMooringInfo,
+  TyphoonInfo
+} from '../shared/serverModel.interface';
 import {
   AreaGroup,
   LandScapeClass,
   Road,
   RoadGroup,
   ShipyardXML
-} from './shared/shipyard.interface';
-import {
-  TyphoonInfo,
-  QuayInfo,
-  QuayMooringInfo
-} from './shared/serverModel.interface';
+} from '../shared/shipyard.interface';
+import * as QuayInfoActions from '../store/quayInfo.actions';
+import * as QuayMooringInfoActions from '../store/quayMooringInfo.actions';
+import { QuayMooringInfoState } from '../store/quayMooringInfo.state';
+import * as TyphoonInfoActions from '../store/typhoonInfo.actions';
+import { TyphoonInfoState } from '../store/typhoonInfo.state';
+import { CanvasInput } from './components/canvas/canvas.component';
 
 const SHIPYARD_XML = shipyard as ShipyardXML;
 
@@ -29,11 +33,13 @@ const SHIPYARD_XML = shipyard as ShipyardXML;
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  @Select(ShipState.fetchShipDynamic('DYNAMIC'))
-  textDynamic$: Observable<string[]>;
-
-  textLazy$: Observable<string[]>;
+export class AppComponent implements OnInit {
+  @Select(TyphoonInfoState.typhoonInfos)
+  typhoonInfos$: Observable<TyphoonInfo[]>;
+  @Select(QuayInfoState.quayInfos)
+  quayInfos$: Observable<QuayInfo[]>;
+  @Select(QuayMooringInfoState.quayMooringInfos)
+  quayMooringInfos$: Observable<QuayMooringInfo[]>;
 
   INITIAL_ZOOM_LEVEL = 1;
   MAX_ZOOM_LEVEL = 3;
@@ -52,21 +58,10 @@ export class AppComponent {
   zoomButtonClickEvent = new Subject<boolean>();
   panButtonClickEvent = new Subject<boolean>();
 
-  constructor(
-    private store: Store,
-    @Inject('BASE_URL') baseUrl: string,
-    http: HttpClient
-  ) {
-    const typhoonInfos$ = http.get<TyphoonInfo[]>(`${baseUrl}api/typhoonInfo`);
-    typhoonInfos$.subscribe(t => console.log(t));
-
-    const quayInfos$ = http.get<QuayInfo[]>(`${baseUrl}api/quayInfo`);
-    quayInfos$.subscribe(q => console.log(q));
-
-    const quayMooringInfos$ = http.get<QuayMooringInfo[]>(
-      `${baseUrl}api/quayMooringInfo`
-    );
-    quayMooringInfos$.subscribe(qm => console.log(qm));
+  constructor(private store: Store) {
+    this.store.dispatch(new TyphoonInfoActions.FetchTyphoonInfos());
+    this.store.dispatch(new QuayInfoActions.FetchQuayInfos());
+    this.store.dispatch(new QuayMooringInfoActions.FetchQuayMooringInfos());
 
     const {
       Appearance,
@@ -149,12 +144,11 @@ export class AppComponent {
     );
 
     this.currentZoomLevel$ = currentZoomLevel$;
+  }
 
-    // this.store.dispatch(new ShipActions.AppendShip('UPDATED'));
-
-    // this.textLazy$ = this.store.select(ShipState.fetchShipLazy).pipe(map(mapper => mapper('LAZY')));
-
-    // this.textLazy$.subscribe(v => console.log(v));
-    // this.textDynamic$.subscribe(v => console.log(v));
+  ngOnInit() {
+    this.typhoonInfos$.subscribe(infos => console.log(infos));
+    this.quayInfos$.subscribe(infos => console.log(infos));
+    this.quayMooringInfos$.subscribe(infos => console.log(infos));
   }
 }
