@@ -8,15 +8,13 @@ import { ClarityModule } from '@clr/angular';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxsModule } from '@ngxs/store';
+import { QuayInfoState } from 'src/store/quayInfo.state';
+import { QuayMooringInfoState } from 'src/store/quayMooringInfo.state';
 import { environment } from '../environments/environment';
-import { ShipState } from '../store/ship.state';
 import { TyphoonInfoState } from '../store/typhoonInfo.state';
 import { AppComponent } from './app.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { ControlPanelComponent } from './components/control-panel/control-panel.component';
-import { QuayInfoState } from 'src/store/quayInfo.state';
-import { QuayMooringInfoState } from 'src/store/quayMooringInfo.state';
-
 @NgModule({
   declarations: [AppComponent, ControlPanelComponent, CanvasComponent],
   imports: [
@@ -25,7 +23,7 @@ import { QuayMooringInfoState } from 'src/store/quayMooringInfo.state';
     FormsModule,
     RouterModule.forRoot([]),
     NgxsModule.forRoot(
-      [ShipState, TyphoonInfoState, QuayInfoState, QuayMooringInfoState],
+      [TyphoonInfoState, QuayInfoState, QuayMooringInfoState],
       {
         developmentMode: !environment.production
       }
