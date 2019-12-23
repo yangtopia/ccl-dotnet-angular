@@ -1,4 +1,13 @@
-<app-control-panel></app-control-panel>
+<app-control-panel
+  [typhoonSpeed]="typhoonSpeed$ | async"
+  [years]="yearOptions$ | async"
+  [typhoons]="typhoonOptions$ | async"
+  [schedules]="schedulesOptions$ | async"
+  (yearChange)="yearChangeEvent.next($event)"
+  (typhoonChange)="typhoonChangeEvent.next($event)"
+  (scheduleChange)="scheduleChangeEvent.next($event)"
+></app-control-panel
+  >
 <app-canvas
   [coastLines]="coastLines"
   [coastLinePs]="coastLinePs"

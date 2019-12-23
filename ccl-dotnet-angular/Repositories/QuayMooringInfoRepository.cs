@@ -42,6 +42,35 @@ namespace ccl_dotnet_angular.Repositories
       return result;
     }
 
+    public IEnumerable<QuayMooringInfo> GetQuayMooringInfoListByYearTyphoon(string year_tphn_no)
+    {
+      IEnumerable<QuayMooringInfo> result = null;
+      try
+      {
+
+        var dyParam = new OracleDynamicParameters();
+        dyParam.Add("YEAR_TPHN_NO", OracleDbType.Varchar2, ParameterDirection.Input, year_tphn_no);
+
+        var conn = this.GetConnection();
+        if (conn.State == ConnectionState.Closed)
+        {
+          conn.Open();
+        }
+
+        if (conn.State == ConnectionState.Open)
+        {
+          var query = "SELECT * FROM NH820M WHERE YEAR_TPHN_NO = :YEAR_TPHN_NO ORDER BY MNTH_DATE DESC, REV_NUMB DESC";
+          result = SqlMapper.Query<QuayMooringInfo>(conn, query, dyParam);
+        }
+      }
+      catch (Exception ex)
+      {
+        throw ex;
+      }
+
+      return result;
+    }
+
     public IDbConnection GetConnection()
     {
       var connectionString = configuration.GetSection("ConnectionStrings").GetSection("oracleConnection").Value;

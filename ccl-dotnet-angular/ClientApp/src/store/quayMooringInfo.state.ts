@@ -27,14 +27,19 @@ export class QuayMooringInfoState {
   }
 
   @Action(QuayMooringInfoActions.FetchQuayMooringInfos)
-  fetchTyphoonInfos(ctx: StateContext<QuayMooringInfoStateModel>) {
+  fetchTyphoonInfos(
+    ctx: StateContext<QuayMooringInfoStateModel>,
+    action: QuayMooringInfoActions.FetchQuayMooringInfos
+  ) {
     return this.http
-      .get<QuayMooringInfo[]>(`${this.baseUrl}api/quayMooringInfo`)
+      .get<QuayMooringInfo[]>(
+        `${this.baseUrl}api/quayMooringInfo/${action.year_tphn_no}`
+      )
       .pipe(
         tap(quayMooringInfos => {
           const state = ctx.getState();
           ctx.patchState({
-            quayMooringInfos: [...state.quayMooringInfos, ...quayMooringInfos]
+            quayMooringInfos
           });
         })
       );

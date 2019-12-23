@@ -30,7 +30,7 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM NH800M";
+          var query = "SELECT * FROM NH800M ORDER BY YEAR DESC, TPHN_NO DESC";
           result = SqlMapper.Query<TyphoonInfo>(conn, query);
         }
       }

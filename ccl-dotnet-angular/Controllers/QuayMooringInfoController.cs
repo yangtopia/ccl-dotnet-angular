@@ -25,5 +25,12 @@ namespace ccl_dotnet_angular.Controllers
       var result = quayMooringInfoRepository.GetQuayMooringInfoList();
       return result;
     }
+
+    [HttpGet("{year_tphn_no}")]
+    public IEnumerable<QuayMooringInfo> GetQuayMooringInfoListByYearTyphoon(string year_tphn_no)
+    {
+      var result = quayMooringInfoRepository.GetQuayMooringInfoListByYearTyphoon(year_tphn_no);
+      return result;
+    }
   }
 }
