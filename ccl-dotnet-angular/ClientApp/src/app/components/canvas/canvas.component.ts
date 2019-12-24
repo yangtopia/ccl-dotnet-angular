@@ -1,9 +1,19 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit
+} from '@angular/core';
 import { fabric } from 'fabric';
-import { Canvas } from 'fabric/fabric-impl';
+import { Canvas, IRectOptions } from 'fabric/fabric-impl';
 import { combineLatest, fromEvent, Observable } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
-import { Coordinate, GroupStyle, LandScapeClass, Road } from 'src/shared/shipyard.interface';
+import {
+  Coordinate,
+  GroupStyle,
+  LandScapeClass,
+  Road
+} from 'src/shared/shipyard.interface';
 
 export interface CanvasInput<T> {
   spaces: T;
@@ -41,14 +51,24 @@ export class CanvasComponent implements OnInit {
     const INITIAL_WIDTH = window.innerWidth;
     const INITIAL_HEIGHT = window.innerHeight;
 
-    const getConvertedCoordinate = (points: Coordinate[], currentWidth: number, currentHeight: number) => {
+    const getConvertedCoordinate = (
+      points: Coordinate[],
+      currentWidth: number,
+      currentHeight: number
+    ) => {
       return points.map(coordinate => {
         const { _X, _Y } = coordinate;
         const deltaY = (this.ratioX * currentHeight) / currentWidth;
-        return {
-          y: (((Number(_X) - this.MOST_INNER_X) * currentWidth) / (this.MOST_OUTER_X - this.MOST_INNER_X)) * deltaY,
-          x: ((Number(_Y) - this.MOST_INNER_Y) * currentHeight) / (this.MOST_OUTER_Y - this.MOST_INNER_Y)
+        const output = {
+          y:
+            (((Number(_X) - this.MOST_INNER_X) * currentWidth) /
+              (this.MOST_OUTER_X - this.MOST_INNER_X)) *
+            deltaY,
+          x:
+            ((Number(_Y) - this.MOST_INNER_Y) * currentHeight) /
+            (this.MOST_OUTER_Y - this.MOST_INNER_Y)
         };
+        return output;
       });
     };
 
@@ -70,7 +90,10 @@ export class CanvasComponent implements OnInit {
         this.fabricCanvas = new fabric.Canvas('canvas');
         this.fabricCanvas.setWidth(canvasWidth);
         this.fabricCanvas.setHeight(canvasHeight);
-        this.fabricCanvas.zoomToPoint(new fabric.Point(canvasWidth / 2, canvasHeight / 2), currentZoomLevel);
+        this.fabricCanvas.zoomToPoint(
+          new fabric.Point(canvasWidth / 2, canvasHeight / 2),
+          currentZoomLevel
+        );
 
         this.fabricCanvas.on('mouse:wheel', opt => {
           const e = opt.e as WheelEvent;
@@ -83,7 +106,10 @@ export class CanvasComponent implements OnInit {
           if (zoom < this.minZoomLevel) {
             zoom = this.minZoomLevel;
           }
-          this.fabricCanvas.zoomToPoint(new fabric.Point(e.offsetX, e.offsetY), zoom);
+          this.fabricCanvas.zoomToPoint(
+            new fabric.Point(e.offsetX, e.offsetY),
+            zoom
+          );
           opt.e.preventDefault();
           opt.e.stopPropagation();
         });
@@ -91,7 +117,11 @@ export class CanvasComponent implements OnInit {
         // COASTLINE
         const { spaces: coastLines, style: coastLineStyle } = this.coastLines;
         const coastLinesPolylines = coastLines.map(coastLine => {
-          const points = getConvertedCoordinate(coastLine.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            coastLine.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             selectable: false,
             fill: 'transparent',
@@ -100,9 +130,16 @@ export class CanvasComponent implements OnInit {
         });
 
         // COASTLINE_P
-        const { spaces: coastLinePs, style: coastLinePStyle } = this.coastLinePs;
+        const {
+          spaces: coastLinePs,
+          style: coastLinePStyle
+        } = this.coastLinePs;
         const coastLinesPolylinePs = coastLinePs.map(coastLineP => {
-          const points = getConvertedCoordinate(coastLineP.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            coastLineP.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             selectable: false,
             fill: '#b2cfff',
@@ -113,7 +150,11 @@ export class CanvasComponent implements OnInit {
         // LOT_MIDDLE
         const { spaces: lotMiddles, style: lotMiddleStyle } = this.lotMiddles;
         const lotMiddlePolylines = lotMiddles.map(lotMiddle => {
-          const points = getConvertedCoordinate(lotMiddle.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            lotMiddle.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             selectable: false,
             fill: '#f2fee3',
@@ -124,7 +165,11 @@ export class CanvasComponent implements OnInit {
         // LOT_SMALL
         const { spaces: lotSmalls, style: lotSmallStyle } = this.lotSmalls;
         const lotSmallPolylines = lotSmalls.map(lotSmall => {
-          const points = getConvertedCoordinate(lotSmall.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            lotSmall.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             selectable: false,
             fill: '#f2fee3',
@@ -135,7 +180,11 @@ export class CanvasComponent implements OnInit {
         // ROADS
         const { spaces: roads, style: roadStyle } = this.roads;
         const roadPolylines = roads.map(road => {
-          const points = getConvertedCoordinate(road.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            road.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             selectable: false,
             fill: '#fff',
@@ -144,9 +193,16 @@ export class CanvasComponent implements OnInit {
         });
 
         // ROAD CENTERLINES
-        const { spaces: roadCenterLines, style: roadCenterLineStyle } = this.roadCenterLines;
+        const {
+          spaces: roadCenterLines,
+          style: roadCenterLineStyle
+        } = this.roadCenterLines;
         const roadCenterLinePolyLines = roadCenterLines.map(roadCenterLine => {
-          const points = getConvertedCoordinate(roadCenterLine.CenterPoints.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            roadCenterLine.CenterPoints.Point,
+            canvasWidth,
+            canvasHeight
+          );
           return new fabric.Polyline(points, {
             fill: 'transparent',
             stroke: 'lightgrey'
@@ -156,7 +212,12 @@ export class CanvasComponent implements OnInit {
         // QUAY NAME SECTORS
         const { spaces: quayNames, style: quayNameStyle } = this.quayNames;
         const quayNameSectorPolyLines = quayNames.map((quayName, idx) => {
-          const points = getConvertedCoordinate(quayName.Points.Point, canvasWidth, canvasHeight);
+          const points = getConvertedCoordinate(
+            quayName.Points.Point,
+            canvasWidth,
+            canvasHeight
+          );
+
           return new fabric.Polyline(points, {
             fill: '#94cae5',
             stroke: '#74bed0'
@@ -171,9 +232,17 @@ export class CanvasComponent implements OnInit {
               case 'H2':
               case 'H3':
               case 'H4':
-                return getConvertedCoordinate([quayName.Origin], canvasWidth, canvasHeight)[0];
+                return getConvertedCoordinate(
+                  [quayName.Origin],
+                  canvasWidth,
+                  canvasHeight
+                )[0];
               default:
-                return getConvertedCoordinate(quayName.Points.Point, canvasWidth, canvasHeight)[1];
+                return getConvertedCoordinate(
+                  quayName.Points.Point,
+                  canvasWidth,
+                  canvasHeight
+                )[1];
             }
           })();
           return new fabric.Text(quayName._Name, {
@@ -181,8 +250,104 @@ export class CanvasComponent implements OnInit {
             top: textPosition.y,
             angle: 39.5,
             fontSize: 10,
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
           });
+        });
+
+        const quayPositionInfos: {
+          quayName: string;
+          quayDesc: string;
+          rectOpt: IRectOptions;
+        }[] = [
+          {
+            quayName: 'R5W',
+            quayDesc: 'RD5서편',
+            rectOpt: {
+              left: 518,
+              top: 240,
+              width: 100
+            }
+          },
+          {
+            quayName: 'R50',
+            quayDesc: 'RD5',
+            rectOpt: {
+              left: 507,
+              top: 253,
+              width: 100
+            }
+          },
+          {
+            quayName: 'R5E',
+            quayDesc: 'RD5동편',
+            rectOpt: {
+              left: 496,
+              top: 266,
+              width: 100
+            }
+          },
+          {
+            quayName: 'R5N',
+            quayDesc: 'RD5북편',
+            rectOpt: {
+              left: 584,
+              top: 317,
+              width: 15
+            }
+          },
+          {
+            quayName: 'A21',
+            quayDesc: 'A2안벽',
+            rectOpt: {
+              left: 422,
+              top: 197,
+              width: 95,
+              height: 13
+            }
+          },
+          {
+            quayName: 'A22',
+            quayDesc: 'A2안벽(이중)',
+            rectOpt: {
+              left: 414,
+              top: 207,
+              width: 95,
+              height: 13
+            }
+          },
+          {
+            quayName: 'C12',
+            quayDesc: 'C안벽(이중)',
+            rectOpt: {
+              left: 411,
+              top: 225,
+              width: 70,
+              height: 13
+            }
+          },
+          {
+            quayName: 'C11',
+            quayDesc: 'C안벽',
+            rectOpt: {
+              left: 403,
+              top: 235,
+              width: 70,
+              height: 13
+            }
+          }
+        ];
+
+        const quaySectors = quayPositionInfos.map(opt => {
+          const defaultOption: IRectOptions = {
+            fill: 'rgba(90, 142, 162, 0.4)',
+            strokeWidth: 1,
+            stroke: '#85fff5',
+            height: 15,
+            angle: 39.5,
+            hasControls: true
+          };
+          const optExtended = { ...defaultOption, ...opt.rectOpt };
+          return new fabric.Rect(optExtended);
         });
 
         this.fabricCanvas.add(
@@ -194,10 +359,17 @@ export class CanvasComponent implements OnInit {
               ...coastLinesPolylines,
               ...roadPolylines,
               ...roadCenterLinePolyLines,
-              ...quayNameSectorPolyLines,
-              ...quayNameTexts
+              // ...quayNameSectorPolyLines,
+              ...quayNameTexts,
+              ...quaySectors
             ],
-            { selectable: true, hasBorders: false, hasControls: false, angle: -39.5, top: canvasHeight * 0.5 }
+            {
+              selectable: true,
+              hasBorders: false,
+              hasControls: false,
+              angle: -39.5,
+              top: canvasHeight * 0.5
+            }
           )
         );
       }
