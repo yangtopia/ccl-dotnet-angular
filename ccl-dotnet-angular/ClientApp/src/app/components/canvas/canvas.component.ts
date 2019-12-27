@@ -619,8 +619,28 @@ export class CanvasComponent implements OnInit {
           origin: {
             originX: 173395,
             originY: 254140,
-            width: 55,
+            width: 60,
             height: 65
+          }
+        },
+        {
+          quayName: '2D0',
+          quayDesc: '2 Dock',
+          origin: {
+            originX: 172775,
+            originY: 253235,
+            width: 530,
+            height: 80
+          }
+        },
+        {
+          quayName: '2DG',
+          quayDesc: '2 D/GATE',
+          origin: {
+            originX: 173125,
+            originY: 253665,
+            width: 70,
+            height: 80
           }
         }
       ];
