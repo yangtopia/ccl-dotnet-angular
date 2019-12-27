@@ -642,6 +642,16 @@ export class CanvasComponent implements OnInit {
             width: 70,
             height: 80
           }
+        },
+        {
+          quayName: 'D3Q',
+          quayDesc: '돌핀안벽',
+          origin: {
+            originX: 173305,
+            originY: 253665,
+            width: 50,
+            height: 140
+          }
         }
       ];
 
