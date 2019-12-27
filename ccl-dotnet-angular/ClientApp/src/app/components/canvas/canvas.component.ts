@@ -375,6 +375,16 @@ export class CanvasComponent implements OnInit {
           }
         },
         {
+          quayName: 'LQW',
+          quayDesc: '특수선 L/Q서편',
+          origin: {
+            originX: 172360,
+            originY: 253830,
+            width: 90,
+            height: 15
+          }
+        },
+        {
           quayName: 'LQE',
           quayDesc: '특수선 L/Q동편',
           origin: {
