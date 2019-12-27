@@ -339,7 +339,7 @@ export class CanvasComponent implements OnInit {
           quayDesc: '특수선 S12(이중)',
           origin: {
             originX: 172590,
-            originY: 253880,
+            originY: 253878,
             width: 20,
             height: 190
           }
