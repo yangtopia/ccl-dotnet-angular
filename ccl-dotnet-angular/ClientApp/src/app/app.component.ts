@@ -51,7 +51,6 @@ export class AppComponent implements OnInit {
   @Select(QuayMooringInfoState.quayMooringInfos)
   quayMooringInfos$: Observable<QuayMooringInfo[]>;
 
-  INITIAL_ZOOM_LEVEL = 1;
   MAX_ZOOM_LEVEL = 3;
   MIN_ZOOM_LEVEL = 0.5;
   STEP_OF_ZOOM_LEVEL = 0.2;

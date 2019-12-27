@@ -5,7 +5,7 @@ import {
   OnInit
 } from '@angular/core';
 import { fabric } from 'fabric';
-import { Canvas, IEvent, IRectOptions } from 'fabric/fabric-impl';
+import { Canvas, IEvent } from 'fabric/fabric-impl';
 import { fromEvent, merge, Subject } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import {
@@ -14,6 +14,15 @@ import {
   LandScapeClass,
   Road
 } from 'src/shared/shipyard.interface';
+import _range from 'lodash/range';
+
+export interface QuayOriginInfo {
+  originX: number;
+  originY: number;
+  width: number;
+  height: number;
+  degree?: number;
+}
 
 export interface CanvasInput<T> {
   spaces: T;
@@ -56,7 +65,7 @@ export class CanvasComponent implements OnInit {
     const INITIAL_WIDTH = window.innerWidth;
     const INITIAL_HEIGHT = window.innerHeight;
 
-    const getConvertedCoordinate = (
+    const getConvertedCoordForPolyline = (
       points: Coordinate[],
       currentWidth: number,
       currentHeight: number
@@ -85,8 +94,12 @@ export class CanvasComponent implements OnInit {
       startWith([INITIAL_WIDTH, INITIAL_HEIGHT])
     );
 
-    const temp = merge(this.zoomButtonClickEvent, this.panButtonClickEvent);
-    temp.subscribe(isZoom => {
+    const isZoomClicked$ = merge(
+      this.zoomButtonClickEvent,
+      this.panButtonClickEvent
+    );
+
+    isZoomClicked$.subscribe(isZoom => {
       const zoom = this.fabricCanvas.getZoom();
       this.fabricCanvas.zoomToPoint(
         this.currentCenterPointer,
@@ -132,7 +145,7 @@ export class CanvasComponent implements OnInit {
       // COASTLINE
       const { spaces: coastLines, style: coastLineStyle } = this.coastLines;
       const coastLinesPolylines = coastLines.map(coastLine => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           coastLine.Points.Point,
           canvasWidth,
           canvasHeight
@@ -147,7 +160,7 @@ export class CanvasComponent implements OnInit {
       // COASTLINE_P
       const { spaces: coastLinePs, style: coastLinePStyle } = this.coastLinePs;
       const coastLinesPolylinePs = coastLinePs.map(coastLineP => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           coastLineP.Points.Point,
           canvasWidth,
           canvasHeight
@@ -162,7 +175,7 @@ export class CanvasComponent implements OnInit {
       // LOT_MIDDLE
       const { spaces: lotMiddles, style: lotMiddleStyle } = this.lotMiddles;
       const lotMiddlePolylines = lotMiddles.map(lotMiddle => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           lotMiddle.Points.Point,
           canvasWidth,
           canvasHeight
@@ -177,7 +190,7 @@ export class CanvasComponent implements OnInit {
       // LOT_SMALL
       const { spaces: lotSmalls, style: lotSmallStyle } = this.lotSmalls;
       const lotSmallPolylines = lotSmalls.map(lotSmall => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           lotSmall.Points.Point,
           canvasWidth,
           canvasHeight
@@ -192,7 +205,7 @@ export class CanvasComponent implements OnInit {
       // ROADS
       const { spaces: roads, style: roadStyle } = this.roads;
       const roadPolylines = roads.map(road => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           road.Points.Point,
           canvasWidth,
           canvasHeight
@@ -210,7 +223,7 @@ export class CanvasComponent implements OnInit {
         style: roadCenterLineStyle
       } = this.roadCenterLines;
       const roadCenterLinePolyLines = roadCenterLines.map(roadCenterLine => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           roadCenterLine.CenterPoints.Point,
           canvasWidth,
           canvasHeight
@@ -224,7 +237,7 @@ export class CanvasComponent implements OnInit {
       // QUAY NAME SECTORS
       const { spaces: quayNames, style: quayNameStyle } = this.quayNames;
       const quayNameSectorPolyLines = quayNames.map((quayName, idx) => {
-        const points = getConvertedCoordinate(
+        const points = getConvertedCoordForPolyline(
           quayName.Points.Point,
           canvasWidth,
           canvasHeight
@@ -244,13 +257,13 @@ export class CanvasComponent implements OnInit {
             case 'H2':
             case 'H3':
             case 'H4':
-              return getConvertedCoordinate(
+              return getConvertedCoordForPolyline(
                 [quayName.Origin],
                 canvasWidth,
                 canvasHeight
               )[0];
             default:
-              return getConvertedCoordinate(
+              return getConvertedCoordForPolyline(
                 quayName.Points.Point,
                 canvasWidth,
                 canvasHeight
@@ -269,97 +282,155 @@ export class CanvasComponent implements OnInit {
       const quayPositionInfos: {
         quayName: string;
         quayDesc: string;
-        rectOpt: IRectOptions;
+        origin: QuayOriginInfo;
       }[] = [
         {
           quayName: 'R5W',
           quayDesc: 'RD5서편',
-          rectOpt: {
-            left: 518,
-            top: 240,
-            width: 100
+          origin: {
+            originX: 172840,
+            originY: 254110,
+            width: 500,
+            height: 80
           }
         },
         {
           quayName: 'R50',
           quayDesc: 'RD5',
-          rectOpt: {
-            left: 507,
-            top: 253,
-            width: 100
+          origin: {
+            originX: 172900,
+            originY: 254060,
+            width: 500,
+            height: 80
           }
         },
         {
           quayName: 'R5E',
           quayDesc: 'RD5동편',
-          rectOpt: {
-            left: 496,
-            top: 266,
-            width: 100
+          origin: {
+            originX: 172960,
+            originY: 254010,
+            width: 500,
+            height: 80
           }
         },
         {
           quayName: 'R5N',
           quayDesc: 'RD5북편',
-          rectOpt: {
-            left: 584,
-            top: 317,
-            width: 15
+          origin: {
+            originX: 173218,
+            originY: 254450,
+            width: 80,
+            height: 80
           }
         },
         {
           quayName: 'A21',
           quayDesc: 'A2안벽',
-          rectOpt: {
-            left: 422,
-            top: 197,
-            width: 95,
-            height: 13
+          origin: {
+            originX: 172645,
+            originY: 253670,
+            width: 420,
+            height: 60
           }
         },
         {
           quayName: 'A22',
           quayDesc: 'A2안벽(이중)',
-          rectOpt: {
-            left: 414,
-            top: 207,
-            width: 95,
-            height: 13
+          origin: {
+            originX: 172695,
+            originY: 253630,
+            width: 420,
+            height: 60
           }
         },
         {
           quayName: 'C12',
           quayDesc: 'C안벽(이중)',
-          rectOpt: {
-            left: 411,
-            top: 225,
-            width: 70,
-            height: 13
+          origin: {
+            originX: 172760,
+            originY: 253610,
+            width: 325,
+            height: 60
           }
         },
         {
           quayName: 'C11',
           quayDesc: 'C안벽',
-          rectOpt: {
-            left: 403,
-            top: 235,
-            width: 70,
-            height: 13
+          origin: {
+            originX: 172810,
+            originY: 253570,
+            width: 325,
+            height: 60
           }
         }
       ];
 
-      const quaySectors = quayPositionInfos.map(opt => {
-        const defaultOption: IRectOptions = {
-          fill: 'rgba(90, 142, 162, 0.4)',
-          strokeWidth: 1,
-          stroke: '#85fff5',
-          height: 15,
-          angle: 39.5,
-          hasControls: true
+      const quayPositionSectorPolyLines = quayPositionInfos.map((info, idx) => {
+        const getNewCoordByDegree = ({
+          originX,
+          originY,
+          degree = 0,
+          width,
+          height
+        }: QuayOriginInfo) => {
+          const radian = (degree * Math.PI) / 180;
+
+          const coords = _range(0, 5).map(idx => {
+            switch (idx) {
+              case 0:
+              case 4:
+                return {
+                  x: originX,
+                  y: originY
+                };
+              case 1:
+                return {
+                  x: originX + width,
+                  y: originY
+                };
+              case 2:
+                return {
+                  x: originX + width,
+                  y: originY + height
+                };
+              case 3:
+                return {
+                  x: originX,
+                  y: originY + height
+                };
+            }
+          });
+
+          const modifiedCoords = coords.map(coord => {
+            const { x, y } = coord;
+            const newX =
+              (x - originX) * Math.cos(radian) -
+              (y - originY) * Math.sin(radian) +
+              originX;
+            const newY =
+              (x - originX) * Math.sin(radian) -
+              (y - originY) * Math.cos(radian) +
+              originY;
+            return {
+              _X: newX.toString(),
+              _Y: newY.toString()
+            } as Coordinate;
+          });
+          return modifiedCoords;
         };
-        const optExtended = { ...defaultOption, ...opt.rectOpt };
-        return new fabric.Rect(optExtended);
+
+        const points = getConvertedCoordForPolyline(
+          getNewCoordByDegree(info.origin),
+          canvasWidth,
+          canvasHeight
+        );
+
+        return new fabric.Polyline(points, {
+          fill: 'rgba(90, 142, 162, 0.4)',
+          stroke: '#85fff5',
+          angle: -50.8
+        });
       });
 
       this.fabricCanvas.add(
@@ -373,14 +444,15 @@ export class CanvasComponent implements OnInit {
             ...roadCenterLinePolyLines,
             // ...quayNameSectorPolyLines,
             ...quayNameTexts,
-            ...quaySectors
+            ...quayPositionSectorPolyLines
           ],
           {
             selectable: true,
             hasBorders: false,
             hasControls: false,
             angle: -39.5,
-            top: canvasHeight * 0.5
+            top: canvasHeight * 0.5,
+            left: canvasWidth * 0.1
           }
         )
       );
