@@ -413,6 +413,37 @@ export class CanvasComponent implements OnInit {
           }
         },
         {
+          quayName: 'OPQ',
+          quayDesc: '옥포매립지',
+          origin: {
+            originX: 172410,
+            originY: 254520,
+            width: 60,
+            height: 20,
+            degree: 60
+          }
+        },
+        {
+          quayName: 'N31',
+          quayDesc: 'N3안벽',
+          origin: {
+            originX: 172450,
+            originY: 254270,
+            width: 340,
+            height: 60
+          }
+        },
+        {
+          quayName: 'N32',
+          quayDesc: 'N3안벽(이중)',
+          origin: {
+            originX: 172400,
+            originY: 254310,
+            width: 340,
+            height: 60
+          }
+        },
+        {
           quayName: 'LQW',
           quayDesc: '특수선 L/Q서편',
           origin: {
@@ -498,11 +529,11 @@ export class CanvasComponent implements OnInit {
         const getNewCoordByDegree = ({
           originX,
           originY,
-          degree = 0,
           width,
           height
         }: QuayOriginInfo) => {
-          const radian = (degree * Math.PI) / 180;
+          // const radian = (degree * Math.PI) / 180;
+          const radian = 0;
 
           const coords = _range(0, 5).map(idx => {
             switch (idx) {
@@ -557,7 +588,7 @@ export class CanvasComponent implements OnInit {
         return new fabric.Polyline(points, {
           fill: 'rgba(90, 142, 162, 0.4)',
           stroke: '#85fff5',
-          angle: -50.8
+          angle: -50.8 - (!info.origin.degree ? 0 : info.origin.degree)
         });
       });
 
