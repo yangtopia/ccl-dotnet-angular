@@ -12,10 +12,10 @@ import {
   filter,
   map,
   scan,
+  shareReplay,
   startWith,
   switchMap,
-  withLatestFrom,
-  shareReplay
+  withLatestFrom
 } from 'rxjs/operators';
 import { QuayInfoState } from 'src/store/quayInfo.state';
 import shipyard from '../assets/json/shipyard.json';
@@ -31,10 +31,7 @@ import {
   RoadGroup,
   ShipyardXML
 } from '../shared/shipyard.interface';
-import * as QuayInfoActions from '../store/quayInfo.actions';
-import * as QuayMooringInfoActions from '../store/quayMooringInfo.actions';
 import { QuayMooringInfoState } from '../store/quayMooringInfo.state';
-import * as TyphoonInfoActions from '../store/typhoonInfo.actions';
 import { TyphoonInfoState } from '../store/typhoonInfo.state';
 import { CanvasInput } from './components/canvas/canvas.component';
 import { TyphoonOption } from './components/control-panel/control-panel.component.js';
@@ -54,7 +51,7 @@ export class AppComponent implements OnInit {
   @Select(QuayMooringInfoState.quayMooringInfos)
   quayMooringInfos$: Observable<QuayMooringInfo[]>;
 
-  INITIAL_ZOOM_LEVEL = 3;
+  INITIAL_ZOOM_LEVEL = 1;
   MAX_ZOOM_LEVEL = 3;
   MIN_ZOOM_LEVEL = 0.5;
   STEP_OF_ZOOM_LEVEL = 0.2;
@@ -76,13 +73,9 @@ export class AppComponent implements OnInit {
   roadCenterLines: CanvasInput<Road[]>;
   quayNames: CanvasInput<LandScapeClass[]>;
 
-  currentZoomLevel$: Observable<number>;
-  zoomButtonClickEvent = new Subject<boolean>();
-  panButtonClickEvent = new Subject<boolean>();
-
   constructor(private store: Store) {
-    this.store.dispatch(new TyphoonInfoActions.FetchTyphoonInfos());
-    this.store.dispatch(new QuayInfoActions.FetchQuayInfos());
+    // this.store.dispatch(new TyphoonInfoActions.FetchTyphoonInfos());
+    // this.store.dispatch(new QuayInfoActions.FetchQuayInfos());
 
     const {
       Appearance,
@@ -147,24 +140,6 @@ export class AppComponent implements OnInit {
       spaces: QUAYNAME_ARR,
       style: _head(spaceStyledDict[AreaGroup.GIFQuayname])
     };
-
-    const currentZoomLevel$ = merge(
-      this.zoomButtonClickEvent,
-      this.panButtonClickEvent
-    ).pipe(
-      scan((acc: number, isZoom: boolean) => {
-        if (isZoom && acc < this.MAX_ZOOM_LEVEL) {
-          return acc + this.STEP_OF_ZOOM_LEVEL;
-        } else if (!isZoom && acc > this.MIN_ZOOM_LEVEL) {
-          return acc - this.STEP_OF_ZOOM_LEVEL;
-        } else {
-          return acc;
-        }
-      }, this.INITIAL_ZOOM_LEVEL),
-      startWith(this.INITIAL_ZOOM_LEVEL)
-    );
-
-    this.currentZoomLevel$ = currentZoomLevel$;
   }
 
   ngOnInit() {
@@ -221,11 +196,11 @@ export class AppComponent implements OnInit {
       })
     );
 
-    quayMooringInfoParam$.subscribe(param => {
-      this.store.dispatch(
-        new QuayMooringInfoActions.FetchQuayMooringInfos(param)
-      );
-    });
+    // quayMooringInfoParam$.subscribe(param => {
+    //   this.store.dispatch(
+    //     new QuayMooringInfoActions.FetchQuayMooringInfos(param)
+    //   );
+    // });
 
     const scheduleDict$ = this.quayMooringInfos$.pipe(
       map(infos => {
