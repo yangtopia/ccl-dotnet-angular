@@ -582,6 +582,46 @@ export class CanvasComponent implements OnInit {
             width: 325,
             height: 60
           }
+        },
+        {
+          quayName: 'R4W',
+          quayDesc: 'RD4서편',
+          origin: {
+            originX: 173050,
+            originY: 253840,
+            width: 440,
+            height: 65
+          }
+        },
+        {
+          quayName: 'R40',
+          quayDesc: 'RD4',
+          origin: {
+            originX: 173110,
+            originY: 253790,
+            width: 440,
+            height: 65
+          }
+        },
+        {
+          quayName: 'R4E',
+          quayDesc: 'RD4동편',
+          origin: {
+            originX: 173170,
+            originY: 253740,
+            width: 440,
+            height: 65
+          }
+        },
+        {
+          quayName: 'R4N',
+          quayDesc: 'RD4북편',
+          origin: {
+            originX: 173395,
+            originY: 254140,
+            width: 55,
+            height: 65
+          }
         }
       ];
 
