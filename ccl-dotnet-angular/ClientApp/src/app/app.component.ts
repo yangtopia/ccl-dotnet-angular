@@ -231,9 +231,9 @@ export class AppComponent implements OnInit {
       })
     );
 
-    currentQuayMooringSchedule$.subscribe(quayMooringInfo =>
-      console.log(quayMooringInfo)
-    );
+    // currentQuayMooringSchedule$.subscribe(quayMooringInfo =>
+    //   console.log(quayMooringInfo)
+    // );
 
     this.typhoonSpeed$ = typhoonSpeed$;
     this.yearOptions$ = yearOptions$;

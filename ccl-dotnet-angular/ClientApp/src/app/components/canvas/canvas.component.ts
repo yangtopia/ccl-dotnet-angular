@@ -15,6 +15,7 @@ import {
   Road
 } from 'src/shared/shipyard.interface';
 import _range from 'lodash/range';
+import _isUndefined from 'lodash/isUndefined';
 
 export interface QuayOriginInfo {
   originX: number;
@@ -116,6 +117,13 @@ export class CanvasComponent implements OnInit {
       this.fabricCanvas = new fabric.Canvas('canvas');
       this.fabricCanvas.setWidth(canvasWidth);
       this.fabricCanvas.setHeight(canvasHeight);
+
+      if (_isUndefined(this.currentCenterPointer)) {
+        this.currentCenterPointer = new fabric.Point(
+          canvasWidth / 2,
+          canvasHeight / 2
+        );
+      }
 
       this.fabricCanvas.on('mouse:up', (fe: IEvent) => {
         this.currentCenterPointer = fe.pointer;
