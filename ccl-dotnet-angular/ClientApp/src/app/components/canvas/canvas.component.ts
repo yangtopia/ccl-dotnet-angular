@@ -290,7 +290,7 @@ export class CanvasComponent implements OnInit {
           origin: {
             originX: 172840,
             originY: 254110,
-            width: 500,
+            width: 470,
             height: 80
           }
         },
@@ -300,7 +300,7 @@ export class CanvasComponent implements OnInit {
           origin: {
             originX: 172900,
             originY: 254060,
-            width: 500,
+            width: 470,
             height: 80
           }
         },
@@ -310,7 +310,7 @@ export class CanvasComponent implements OnInit {
           origin: {
             originX: 172960,
             originY: 254010,
-            width: 500,
+            width: 470,
             height: 80
           }
         },
@@ -318,10 +318,50 @@ export class CanvasComponent implements OnInit {
           quayName: 'R5N',
           quayDesc: 'RD5북편',
           origin: {
-            originX: 173218,
-            originY: 254450,
-            width: 80,
+            originX: 173198,
+            originY: 254425,
+            width: 100,
             height: 80
+          }
+        },
+        {
+          quayName: 'S11',
+          quayDesc: '특수선 S11',
+          origin: {
+            originX: 172575,
+            originY: 253860,
+            width: 20,
+            height: 190
+          }
+        },
+        {
+          quayName: 'S12',
+          quayDesc: '특수선 S12(이중)',
+          origin: {
+            originX: 172590,
+            originY: 253880,
+            width: 20,
+            height: 190
+          }
+        },
+        {
+          quayName: 'A31',
+          quayDesc: 'A3안벽',
+          origin: {
+            originX: 172605,
+            originY: 253770,
+            width: 370,
+            height: 60
+          }
+        },
+        {
+          quayName: 'A32',
+          quayDesc: 'A3안벽(이중)',
+          origin: {
+            originX: 172555,
+            originY: 253810,
+            width: 370,
+            height: 60
           }
         },
         {
