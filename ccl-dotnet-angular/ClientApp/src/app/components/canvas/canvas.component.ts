@@ -873,6 +873,92 @@ export class CanvasComponent implements OnInit {
             height: 60
           }
         },
+        {
+          quayName: 'G1D',
+          quayDesc: 'G1돌핀',
+          origin: {
+            originX: 174105,
+            originY: 253915,
+            width: 60,
+            height: 60
+          }
+        },
+        {
+          quayName: 'G1F',
+          quayDesc: 'G1고정',
+          origin: {
+            originX: 174145,
+            originY: 253965,
+            width: 110,
+            height: 60
+          }
+        },
+        {
+          quayName: 'G11',
+          quayDesc: 'G1 H/Z',
+          origin: {
+            originX: 174225,
+            originY: 254085,
+            width: 240,
+            height: 60,
+            degree: -2
+          }
+        },
+        {
+          quayName: 'G12',
+          quayDesc: 'G1 H/Z(이중)',
+          origin: {
+            originX: 174180,
+            originY: 254125,
+            width: 240,
+            height: 60,
+            degree: -2
+          }
+        },
+        {
+          quayName: 'G2D',
+          quayDesc: 'G2 돌핀',
+          origin: {
+            originX: 174385,
+            originY: 254265,
+            width: 65,
+            height: 60,
+            degree: -2
+          }
+        },
+        {
+          quayName: 'G21',
+          quayDesc: 'G2 H/Z',
+          origin: {
+            originX: 174430,
+            originY: 254315,
+            width: 220,
+            height: 60,
+            degree: -2
+          }
+        },
+        {
+          quayName: 'G22',
+          quayDesc: 'G2 H/Z(이중)',
+          origin: {
+            originX: 174385,
+            originY: 254355,
+            width: 220,
+            height: 60,
+            degree: -2
+          }
+        },
+        {
+          quayName: 'G3D',
+          quayDesc: 'G3안벽',
+          origin: {
+            originX: 174580,
+            originY: 254485,
+            width: 100,
+            height: 60,
+            degree: -2
+          }
+        }
       ];
 
       const quayPositionSectorPolyLines = quayPositionInfos.map((info, idx) => {
