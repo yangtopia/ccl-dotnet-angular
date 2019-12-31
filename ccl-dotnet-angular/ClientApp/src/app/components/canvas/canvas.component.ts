@@ -958,6 +958,17 @@ export class CanvasComponent implements OnInit {
             height: 60,
             degree: -2
           }
+        },
+        {
+          quayName: 'G3F',
+          quayDesc: 'G3고정',
+          origin: {
+            originX: 174655,
+            originY: 254570,
+            width: 125,
+            height: 60,
+            degree: -2
+          }
         }
       ];
 
