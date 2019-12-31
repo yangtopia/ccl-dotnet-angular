@@ -1009,6 +1009,46 @@ export class CanvasComponent implements OnInit {
             width: 60,
             height: 295
           }
+        },
+        {
+          quayName: 'H31',
+          quayDesc: 'H3안벽',
+          origin: {
+            originX: 174510,
+            originY: 255215,
+            width: 60,
+            height: 295
+          }
+        },
+        {
+          quayName: 'H32',
+          quayDesc: 'H3안벽(이중)',
+          origin: {
+            originX: 174473,
+            originY: 255170,
+            width: 60,
+            height: 295
+          }
+        },
+        {
+          quayName: 'H41',
+          quayDesc: 'H4안벽',
+          origin: {
+            originX: 174740,
+            originY: 255027,
+            width: 60,
+            height: 295
+          }
+        },
+        {
+          quayName: 'H42',
+          quayDesc: 'H4안벽(이중)',
+          origin: {
+            originX: 174703,
+            originY: 254982,
+            width: 60,
+            height: 295
+          }
         }
       ];
 
