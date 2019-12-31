@@ -383,6 +383,16 @@ export class CanvasComponent implements OnInit {
           }
         },
         {
+          quayName: 'N00',
+          quayDesc: 'N0안벽',
+          origin: {
+            originX: 172315,
+            originY: 253925,
+            width: 130,
+            height: 130
+          }
+        },
+        {
           quayName: 'N11',
           quayDesc: 'N1안벽',
           origin: {
@@ -761,6 +771,16 @@ export class CanvasComponent implements OnInit {
             originY: 252785,
             width: 50,
             height: 15
+          }
+        },
+        {
+          quayName: 'TXQ',
+          quayDesc: '텍사코',
+          origin: {
+            originX: 173475,
+            originY: 252820,
+            width: 90,
+            height: 240
           }
         },
         {
