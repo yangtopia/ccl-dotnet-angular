@@ -1049,7 +1049,17 @@ export class CanvasComponent implements OnInit {
             width: 60,
             height: 295
           }
-        }
+        },
+        {
+          quayName: 'HTP',
+          quayDesc: 'H-TIP안벽',
+          origin: {
+            originX: 174203,
+            originY: 255090,
+            width: 60,
+            height: 60
+          }
+        },
       ];
 
       const quayPositionSectorPolyLines = quayPositionInfos.map((info, idx) => {
