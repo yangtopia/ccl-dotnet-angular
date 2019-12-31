@@ -17,6 +17,8 @@ import {
 import quays from '../../../assets/json/quays.json';
 import _range from 'lodash/range';
 import _isUndefined from 'lodash/isUndefined';
+import _inRange from 'lodash/inRange';
+import _find from 'lodash/find';
 
 export interface QuayOriginInfo {
   originX: number;
@@ -30,6 +32,7 @@ export interface QuayInfo {
   quayName: string;
   quayDesc: string;
   origin: QuayOriginInfo;
+  sector?: [number, number][];
 }
 
 export interface CanvasInput<T> {
@@ -75,22 +78,50 @@ export class CanvasComponent implements OnInit {
     const INITIAL_WIDTH = window.innerWidth;
     const INITIAL_HEIGHT = window.innerHeight;
 
+    function isPointInsideOfRect(point, coordinates) {
+      let x = point[0];
+      let y = point[1];
+
+      let inside = false;
+      for (
+        let i = 0, j = coordinates.length - 1;
+        i < coordinates.length;
+        j = i++
+      ) {
+        let xi = coordinates[i][0],
+          yi = coordinates[i][1];
+        let xj = coordinates[j][0],
+          yj = coordinates[j][1];
+
+        let intersect =
+          yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+
+      return inside;
+    }
+
+    const getX = (y: string | Number, currentHeight: number) =>
+      ((Number(y) - this.MOST_INNER_Y) * currentHeight) /
+      (this.MOST_OUTER_Y - this.MOST_INNER_Y);
+
+    const getY = (x: string | Number, currentWidth: number, deltaY: number) =>
+      (((Number(x) - this.MOST_INNER_X) * currentWidth) /
+        (this.MOST_OUTER_X - this.MOST_INNER_X)) *
+      deltaY;
+
     const getConvertedCoordForPolyline = (
       points: Coordinate[],
       currentWidth: number,
       currentHeight: number
     ) => {
+      const deltaY = (this.ratioX * currentHeight) / currentWidth;
       return points.map(coordinate => {
         const { _X, _Y } = coordinate;
-        const deltaY = (this.ratioX * currentHeight) / currentWidth;
+
         const output = {
-          y:
-            (((Number(_X) - this.MOST_INNER_X) * currentWidth) /
-              (this.MOST_OUTER_X - this.MOST_INNER_X)) *
-            deltaY,
-          x:
-            ((Number(_Y) - this.MOST_INNER_Y) * currentHeight) /
-            (this.MOST_OUTER_Y - this.MOST_INNER_Y)
+          x: getX(_Y, currentHeight),
+          y: getY(_X, currentWidth, deltaY)
         };
         return output;
       });
@@ -298,96 +329,123 @@ export class CanvasComponent implements OnInit {
 
       const quayPositionInfos = QUAY_INFOS;
 
-      const quayPositionSectorPolyLines = quayPositionInfos.map((info, idx) => {
-        const getNewCoordByDegree = ({
-          originX,
-          originY,
-          width,
-          height
-        }: QuayOriginInfo) => {
-          // const radian = (degree * Math.PI) / 180;
-          const radian = 0;
+      const getNewCoordByDegree = ({
+        originX,
+        originY,
+        width,
+        height
+      }: QuayOriginInfo) => {
+        // const radian = (degree * Math.PI) / 180;
+        const radian = 0;
 
-          const coords = _range(0, 5).map(idx => {
-            switch (idx) {
-              case 0:
-              case 4:
-                return {
-                  x: originX,
-                  y: originY
-                };
-              case 1:
-                return {
-                  x: originX + width,
-                  y: originY
-                };
-              case 2:
-                return {
-                  x: originX + width,
-                  y: originY + height
-                };
-              case 3:
-                return {
-                  x: originX,
-                  y: originY + height
-                };
-            }
-          });
-
-          const modifiedCoords = coords.map(coord => {
-            const { x, y } = coord;
-            const newX =
-              (x - originX) * Math.cos(radian) -
-              (y - originY) * Math.sin(radian) +
-              originX;
-            const newY =
-              (x - originX) * Math.sin(radian) -
-              (y - originY) * Math.cos(radian) +
-              originY;
-            return {
-              _X: newX.toString(),
-              _Y: newY.toString()
-            } as Coordinate;
-          });
-          return modifiedCoords;
-        };
-
-        const points = getConvertedCoordForPolyline(
-          getNewCoordByDegree(info.origin),
-          canvasWidth,
-          canvasHeight
-        );
-
-        return new fabric.Polyline(points, {
-          fill: 'rgba(90, 142, 162, 0.4)',
-          stroke: '#85fff5',
-          angle: -50.8 - (!info.origin.degree ? 0 : info.origin.degree)
+        const coords = _range(0, 5).map(idx => {
+          switch (idx) {
+            case 0:
+            case 4:
+              return {
+                x: originX,
+                y: originY
+              };
+            case 1:
+              return {
+                x: originX + width,
+                y: originY
+              };
+            case 2:
+              return {
+                x: originX + width,
+                y: originY + height
+              };
+            case 3:
+              return {
+                x: originX,
+                y: originY + height
+              };
+          }
         });
+
+        const modifiedCoords = coords.map(coord => {
+          const { x, y } = coord;
+          const newX =
+            (x - originX) * Math.cos(radian) -
+            (y - originY) * Math.sin(radian) +
+            originX;
+          const newY =
+            (x - originX) * Math.sin(radian) -
+            (y - originY) * Math.cos(radian) +
+            originY;
+          return {
+            _X: newX.toString(),
+            _Y: newY.toString()
+          } as Coordinate;
+        });
+        return modifiedCoords;
+      };
+
+      const pointedQuayPositionInfos = quayPositionInfos.map(info => {
+        return {
+          ...info,
+          points: getConvertedCoordForPolyline(
+            getNewCoordByDegree(info.origin),
+            canvasWidth,
+            canvasHeight
+          )
+        };
       });
 
-      this.fabricCanvas.add(
-        new fabric.Group(
-          [
-            ...coastLinesPolylinePs,
-            ...lotMiddlePolylines,
-            ...lotSmallPolylines,
-            ...coastLinesPolylines,
-            ...roadPolylines,
-            ...roadCenterLinePolyLines,
-            // ...quayNameSectorPolyLines,
-            ...quayNameTexts,
-            ...quayPositionSectorPolyLines
-          ],
-          {
-            selectable: true,
-            hasBorders: false,
-            hasControls: false,
-            angle: -39.5,
-            top: canvasHeight * 0.5,
-            left: canvasWidth * 0.1
-          }
-        )
+      const quayPositionSectorPolyLines = pointedQuayPositionInfos.map(
+        (info, idx) => {
+          return new fabric.Polyline(info.points, {
+            fill: 'rgba(90, 142, 162, 0.4)',
+            stroke: '#85fff5',
+            angle: -50.8 - (!info.origin.degree ? 0 : info.origin.degree)
+          });
+        }
       );
+
+      const groupOfBackgroundMap = new fabric.Group(
+        [
+          ...coastLinesPolylinePs,
+          ...lotMiddlePolylines,
+          ...lotSmallPolylines,
+          ...coastLinesPolylines,
+          ...roadPolylines,
+          ...roadCenterLinePolyLines,
+          // ...quayNameSectorPolyLines,
+          ...quayPositionSectorPolyLines,
+          ...quayNameTexts,
+        ],
+        {
+          selectable: true,
+          hasBorders: false,
+          hasControls: false,
+          angle: -39.5,
+          top: canvasHeight * 0.5,
+          left: canvasWidth * 0.1
+        }
+      );
+
+      this.fabricCanvas.add(groupOfBackgroundMap);
+
+      this.fabricCanvas.on('mouse:down', opt => {
+        const target = opt.target;
+        const { x: localX, y: localY } = target.getLocalPointer(opt.e);
+
+        const clickedQuay = _find(quayPositionInfos, info => {
+          if (info.sector) {
+            const sector = info.sector;
+            return isPointInsideOfRect(
+              [(localX / target.width) * 100, (localY / target.height) * 100],
+              sector
+            );
+          }
+          return false;
+        });
+
+        console.log(clickedQuay);
+
+        // console.log(targetCanvas.getScaledHeight(), targetCanvas.getScaledWidth());
+      });
     });
   }
 }
