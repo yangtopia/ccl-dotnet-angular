@@ -833,6 +833,46 @@ export class CanvasComponent implements OnInit {
             height: 60
           }
         },
+        {
+          quayName: 'F11',
+          quayDesc: 'F1안벽',
+          origin: {
+            originX: 173925,
+            originY: 253510,
+            width: 340,
+            height: 52
+          }
+        },
+        {
+          quayName: 'F12',
+          quayDesc: 'F1안벽(이중)',
+          origin: {
+            originX: 173966,
+            originY: 253476,
+            width: 340,
+            height: 52
+          }
+        },
+        {
+          quayName: 'F11',
+          quayDesc: 'F1안벽',
+          origin: {
+            originX: 173865,
+            originY: 253570,
+            width: 380,
+            height: 60
+          }
+        },
+        {
+          quayName: 'F12',
+          quayDesc: 'F1안벽(이중)',
+          origin: {
+            originX: 173815,
+            originY: 253610,
+            width: 380,
+            height: 60
+          }
+        },
       ];
 
       const quayPositionSectorPolyLines = quayPositionInfos.map((info, idx) => {
