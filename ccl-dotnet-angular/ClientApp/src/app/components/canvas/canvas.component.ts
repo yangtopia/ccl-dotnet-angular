@@ -6,6 +6,9 @@ import {
 } from '@angular/core';
 import { fabric } from 'fabric';
 import { Canvas, IEvent } from 'fabric/fabric-impl';
+import _find from 'lodash/find';
+import _isUndefined from 'lodash/isUndefined';
+import _range from 'lodash/range';
 import { fromEvent, merge, Subject } from 'rxjs';
 import { debounceTime, map, startWith } from 'rxjs/operators';
 import {
@@ -15,10 +18,6 @@ import {
   Road
 } from 'src/shared/shipyard.interface';
 import quays from '../../../assets/json/quays.json';
-import _range from 'lodash/range';
-import _isUndefined from 'lodash/isUndefined';
-import _inRange from 'lodash/inRange';
-import _find from 'lodash/find';
 
 export interface QuayOriginInfo {
   originX: number;
@@ -413,7 +412,7 @@ export class CanvasComponent implements OnInit {
           ...roadCenterLinePolyLines,
           // ...quayNameSectorPolyLines,
           ...quayPositionSectorPolyLines,
-          ...quayNameTexts,
+          ...quayNameTexts
         ],
         {
           selectable: true,
@@ -442,9 +441,9 @@ export class CanvasComponent implements OnInit {
           return false;
         });
 
-        console.log(clickedQuay);
-
-        // console.log(targetCanvas.getScaledHeight(), targetCanvas.getScaledWidth());
+        if (clickedQuay) {
+          console.log(clickedQuay);
+        }
       });
     });
   }
