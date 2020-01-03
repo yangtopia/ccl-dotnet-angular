@@ -7,3 +7,25 @@
 .zoom-control .btn {
   font-size: 0.75rem !important;
 }
+
+.quay-popup {
+  display: none;
+  position: absolute;
+  height: auto;
+  .table {
+    table-layout: fixed;
+    margin-top: 0;
+    width: 240px;
+    th {
+      vertical-align: middle;
+    }
+  }
+}
+
+.result-table {
+  position: fixed;
+  width: 144px;
+  margin-right: 12px;
+  bottom: 80px;
+  right: 30px;
+}

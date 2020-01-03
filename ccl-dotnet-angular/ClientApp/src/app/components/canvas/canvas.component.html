@@ -7,3 +7,62 @@
     ><clr-icon shape="minus"></clr-icon>축소</clr-button
   >
 </clr-button-group>
+<div #popup class="quay-popup">
+  <table class="table">
+    <colgroup>
+      <col width="40%">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>{{ (quayMooringPopupInfo$ | async)?.quayDesc }}</th>
+        <th>풍속</th>
+        <th>도면</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>실제</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.realWindSpeed }}</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}</td>
+      </tr>
+      <tr>
+        <td>최대</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.maxWindSpeed }}</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}</td>
+      </tr>
+      <tr>
+        <td>태풍</td>
+        <td>{{ (QuayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}</td>
+        <td>{{ (QuayMooringPopupInfo$ | async)?.satisfiedMoorDrawing }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="result-table">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>구분</th>
+        <th>척수</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>만족</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>불가능</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>수정가능</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>합계</td>
+        <td>20000</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

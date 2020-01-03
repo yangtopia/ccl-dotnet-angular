@@ -7,11 +7,10 @@ import _head from 'lodash/head';
 import _isEmpty from 'lodash/isEmpty';
 import _keys from 'lodash/keys';
 import _uniq from 'lodash/uniq';
-import { merge, Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   filter,
   map,
-  scan,
   shareReplay,
   startWith,
   switchMap,
@@ -35,8 +34,13 @@ import { QuayMooringInfoState } from '../store/quayMooringInfo.state';
 import { TyphoonInfoState } from '../store/typhoonInfo.state';
 import { CanvasInput } from './components/canvas/canvas.component';
 import { TyphoonOption } from './components/control-panel/control-panel.component.js';
+import * as TyphoonInfoActions from '../store/typhoonInfo.actions';
+import * as QuayInfoActions from '../store/quayInfo.actions';
+import * as QuayMooringInfoActions from '../store/quayMooringInfo.actions';
+import quays from '../assets/json/quays.json';
 
 const SHIPYARD_XML = shipyard as ShipyardXML;
+const QUAY_INFOS = quays as QuayInfo[];
 
 @Component({
   selector: 'app-root',
@@ -59,6 +63,7 @@ export class AppComponent implements OnInit {
   yearOptions$: Observable<string[]>;
   typhoonOptions$: Observable<TyphoonOption[]>;
   schedulesOptions$: Observable<string[]>;
+  quayMooringSchedules$: Observable<QuayMooringInfo[]>;
 
   yearChangeEvent = new Subject<string>();
   typhoonChangeEvent = new Subject<TyphoonOption>();
@@ -73,8 +78,8 @@ export class AppComponent implements OnInit {
   quayNames: CanvasInput<LandScapeClass[]>;
 
   constructor(private store: Store) {
-    // this.store.dispatch(new TyphoonInfoActions.FetchTyphoonInfos());
-    // this.store.dispatch(new QuayInfoActions.FetchQuayInfos());
+    this.store.dispatch(new TyphoonInfoActions.FetchTyphoonInfos());
+    this.store.dispatch(new QuayInfoActions.FetchQuayInfos());
 
     const {
       Appearance,
@@ -195,11 +200,11 @@ export class AppComponent implements OnInit {
       })
     );
 
-    // quayMooringInfoParam$.subscribe(param => {
-    //   this.store.dispatch(
-    //     new QuayMooringInfoActions.FetchQuayMooringInfos(param)
-    //   );
-    // });
+    quayMooringInfoParam$.subscribe(param => {
+      this.store.dispatch(
+        new QuayMooringInfoActions.FetchQuayMooringInfos(param)
+      );
+    });
 
     const scheduleDict$ = this.quayMooringInfos$.pipe(
       map(infos => {
@@ -228,16 +233,15 @@ export class AppComponent implements OnInit {
       withLatestFrom(scheduleDict$),
       map(([selectedScheduleOption, scheduleDict]) => {
         return scheduleDict[selectedScheduleOption];
-      })
+      }),
+      filter(s => !_isEmpty(s)),
+      shareReplay(1)
     );
-
-    // currentQuayMooringSchedule$.subscribe(quayMooringInfo =>
-    //   console.log(quayMooringInfo)
-    // );
 
     this.typhoonSpeed$ = typhoonSpeed$;
     this.yearOptions$ = yearOptions$;
     this.typhoonOptions$ = typhoonOptions$;
     this.schedulesOptions$ = scheduleOptions$;
+    this.quayMooringSchedules$ = currentQuayMooringSchedule$;
   }
 }

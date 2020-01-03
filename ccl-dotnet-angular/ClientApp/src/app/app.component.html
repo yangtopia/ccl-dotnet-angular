@@ -6,8 +6,7 @@
   (yearChange)="yearChangeEvent.next($event)"
   (typhoonChange)="typhoonChangeEvent.next($event)"
   (scheduleChange)="scheduleChangeEvent.next($event)"
-></app-control-panel
-  >
+></app-control-panel>
 <app-canvas
   [coastLines]="coastLines"
   [coastLinePs]="coastLinePs"
@@ -18,4 +17,5 @@
   [lotMiddles]="lotMiddles"
   [maxZoomLevel]="MAX_ZOOM_LEVEL"
   [minZoomLevel]="MIN_ZOOM_LEVEL"
+  [quayMooringSchedules$]="quayMooringSchedules$"
 ></app-canvas>
