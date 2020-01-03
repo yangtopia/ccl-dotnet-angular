@@ -234,7 +234,6 @@ export class AppComponent implements OnInit {
       map(([selectedScheduleOption, scheduleDict]) => {
         return scheduleDict[selectedScheduleOption];
       }),
-      filter(s => !_isEmpty(s)),
       shareReplay(1)
     );
 

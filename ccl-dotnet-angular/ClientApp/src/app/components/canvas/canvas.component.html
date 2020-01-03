@@ -25,18 +25,32 @@
     <tbody>
       <tr>
         <td>실제</td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.realWindSpeed }}</td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}</td>
+        <td
+          [ngStyle]="{
+            'background-color': (quayMooringPopupInfo$ | async)?.realWindColor
+          }"
+        >
+          {{ (quayMooringPopupInfo$ | async)?.realWindSpeed }}
+        </td>
+        <td>
+          {{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}
+        </td>
       </tr>
       <tr>
         <td>최대</td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.maxWindSpeed }}</td>
+        <td
+          [ngStyle]="{
+            'background-color': (quayMooringPopupInfo$ | async)?.maxWindColor
+          }"
+        >
+          {{ (quayMooringPopupInfo$ | async)?.maxWindSpeed }}
+        </td>
         <td>{{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}</td>
       </tr>
       <tr>
         <td>태풍</td>
-        <td>{{ (QuayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}</td>
-        <td>{{ (QuayMooringPopupInfo$ | async)?.satisfiedMoorDrawing }}</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}</td>
+        <td>{{ (quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing }}</td>
       </tr>
     </tbody>
   </table>
@@ -52,19 +66,19 @@
     <tbody>
       <tr>
         <td>만족</td>
-        <td>0</td>
+        <td>{{ (quayMooringResult$ | async)?.satisfiedCount }}</td>
       </tr>
       <tr>
         <td>불가능</td>
-        <td>0</td>
+        <td>{{ (quayMooringResult$ | async)?.impossibleCount }}</td>
       </tr>
       <tr>
         <td>수정가능</td>
-        <td>0</td>
+        <td>{{ (quayMooringResult$ | async)?.editableCount }}</td>
       </tr>
       <tr>
         <td>합계</td>
-        <td>20000</td>
+        <td>{{ (quayMooringResult$ | async)?.total }}</td>
       </tr>
     </tbody>
   </table>

@@ -12,6 +12,7 @@ import _find from 'lodash/find';
 import _isUndefined from 'lodash/isUndefined';
 import _keyBy from 'lodash/keyBy';
 import _range from 'lodash/range';
+import _countBy from 'lodash/countBy';
 import {
   combineLatest,
   fromEvent,
@@ -25,7 +26,8 @@ import {
   distinctUntilChanged,
   map,
   shareReplay,
-  startWith
+  startWith,
+  filter
 } from 'rxjs/operators';
 import { QuayMooringInfo } from 'src/shared/serverModel.interface.js';
 import {
@@ -65,12 +67,22 @@ export interface QuayMooringPopupInfo {
   quayName: string;
   quayDesc: string;
   projNum?: string;
-  realWindSpeed?: number;
-  maxWindSpeed?: number;
-  satisfiedWindSpeed?: number;
+  realWindSpeed?: number | string;
+  realWindColor?: string;
+  maxWindSpeed?: number | string;
+  maxWindColor?: string;
+  satisfiedWindSpeed?: number | string;
+  satisfiedWindColor?: string;
   realMoorDrawing?: string;
   maxMoorDrawing?: string;
   satisfiedMoorDrawing?: string;
+}
+
+export interface QuayMooringResult {
+  satisfiedCount: number;
+  impossibleCount: number;
+  editableCount: number;
+  total: number;
 }
 
 const QUAY_INFOS = quays as QuayInfo[];
@@ -94,6 +106,7 @@ export class CanvasComponent implements OnInit {
   @Input() roadCenterLines: CanvasInput<Road[]>;
   @Input() quayNames: CanvasInput<LandScapeClass[]>;
 
+  @Input() typhoonSpeed: number;
   @Input() quayMooringSchedules$: Observable<QuayMooringInfo[]>;
 
   MOST_INNER_X = 171659.5794;
@@ -114,6 +127,7 @@ export class CanvasComponent implements OnInit {
 
   selectedQuayInfo: Observable<QuayClickEvent>;
   quayMooringPopupInfo$: Observable<QuayMooringPopupInfo>;
+  quayMooringResult$: Observable<QuayMooringResult>;
 
   ngOnInit() {
     const INITIAL_WIDTH = window.innerWidth;
@@ -189,12 +203,46 @@ export class CanvasComponent implements OnInit {
       );
     });
 
+    const quayMooringResult$ = this.quayMooringSchedules$.pipe(
+      map<QuayMooringInfo[], QuayMooringResult>(schedules => {
+        if (_isUndefined(schedules)) {
+          return {
+            satisfiedCount: 0,
+            impossibleCount: 0,
+            editableCount: 0,
+            total: 0
+          };
+        }
+        const satisfiedCount = _countBy(schedules, schedule => {
+          return schedule.real_wdsp >= this.typhoonSpeed;
+        })['true'] || 0;
+
+        const impossibleCount = _countBy(schedules, schedule => {
+          const { real_wdsp, max_wdsp, sfty_wdsp } = schedule;
+          return (
+            real_wdsp < this.typhoonSpeed &&
+            max_wdsp < this.typhoonSpeed &&
+            sfty_wdsp < this.typhoonSpeed
+          );
+        })['true'] || 0;
+
+        return {
+          satisfiedCount: satisfiedCount,
+          impossibleCount: impossibleCount,
+          editableCount: schedules.length - satisfiedCount - impossibleCount,
+          total: schedules.length
+        };
+      })
+    );
+
+    this.quayMooringResult$ = quayMooringResult$;
+
     combineLatest([windowResizeEvent$, this.quayMooringSchedules$]).subscribe(
       ([[screenWidth, screenHeight], quayMooringSchedules]) => {
         const canvasWidth = screenWidth;
         const canvasHeight = screenHeight;
         const quayMooringDict = _keyBy(quayMooringSchedules, 'quay_name');
-        console.log(quayMooringDict);
+
         if (this.fabricCanvas) {
           this.fabricCanvas.dispose();
           this.popup.nativeElement.style.display = 'none';
@@ -560,16 +608,36 @@ export class CanvasComponent implements OnInit {
                 sfty_wdsp,
                 sfty_moor_dwg
               } = quayMooringDict[clickedQuay.quayName];
+
+              const color = (() => {
+                if (real_wdsp >= this.typhoonSpeed) {
+                  return '#32cd32';
+                } else if (
+                  max_wdsp >= this.typhoonSpeed ||
+                  sfty_wdsp >= this.typhoonSpeed
+                ) {
+                  return '#ffa500';
+                } else if (
+                  real_wdsp < this.typhoonSpeed &&
+                  max_wdsp < this.typhoonSpeed &&
+                  sfty_wdsp < this.typhoonSpeed
+                ) {
+                  return '#ff4500';
+                }
+              })();
+
               return {
                 quayName: quayName,
                 quayDesc: quayDesc,
                 projNum: proj_no,
-                realWindSpeed: real_wdsp,
-                maxWindSpeed: max_wdsp,
-                satisfiedWindSpeed: sfty_wdsp,
-                realMoorDrawing: real_moor_dwg,
-                maxMoorDrawing: max_moor_dwg,
-                satisfiedMoorDrawing: sfty_moor_dwg
+                realWindSpeed: real_wdsp || '-',
+                realWindColor: !real_wdsp ? '#fff' : color,
+                maxWindSpeed: max_wdsp || '-',
+                maxWindColor: !max_wdsp ? '#fff' : color,
+                satisfiedWindSpeed: sfty_wdsp || '-',
+                realMoorDrawing: real_moor_dwg || '-',
+                maxMoorDrawing: max_moor_dwg || '-',
+                satisfiedMoorDrawing: sfty_moor_dwg || '-'
               };
             } else {
               return {
