@@ -10,7 +10,12 @@ import _find from 'lodash/find';
 import _isUndefined from 'lodash/isUndefined';
 import _range from 'lodash/range';
 import { fromEvent, merge, Subject } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import {
+  debounceTime,
+  map,
+  startWith,
+  distinctUntilChanged
+} from 'rxjs/operators';
 import {
   Coordinate,
   GroupStyle,
@@ -37,6 +42,17 @@ export interface QuayInfo {
 export interface CanvasInput<T> {
   spaces: T;
   style?: GroupStyle;
+}
+
+export interface QuayClickEvent {
+  quayName: string;
+  quayDesc: string;
+  realWindSpeed?: number;
+  maxWindSpeed?: number;
+  satisfiedWindSpeed?: number;
+  realMoorDrawing?: string;
+  maxMoorDrawing?: string;
+  satisfiedMoorDrawing?: string;
 }
 
 const QUAY_INFOS = quays as QuayInfo[];
@@ -72,6 +88,7 @@ export class CanvasComponent implements OnInit {
 
   zoomButtonClickEvent = new Subject<boolean>();
   panButtonClickEvent = new Subject<boolean>();
+  quayClickEvent = new Subject<QuayClickEvent>();
 
   ngOnInit() {
     const INITIAL_WIDTH = window.innerWidth;
@@ -153,7 +170,10 @@ export class CanvasComponent implements OnInit {
       if (this.fabricCanvas) {
         this.fabricCanvas.dispose();
       }
-      this.fabricCanvas = new fabric.Canvas('canvas');
+      this.fabricCanvas = new fabric.Canvas('canvas', {
+        selection: false,
+        hoverCursor: 'arrow',
+      });
       this.fabricCanvas.setWidth(canvasWidth);
       this.fabricCanvas.setHeight(canvasHeight);
 
@@ -426,25 +446,58 @@ export class CanvasComponent implements OnInit {
 
       this.fabricCanvas.add(groupOfBackgroundMap);
 
-      this.fabricCanvas.on('mouse:down', opt => {
+      this.fabricCanvas.on('mouse:move', opt => {
         const target = opt.target;
-        const { x: localX, y: localY } = target.getLocalPointer(opt.e);
+        if (target) {
+          const { x: localX, y: localY } = target.getLocalPointer(opt.e);
 
-        const clickedQuay = _find(quayPositionInfos, info => {
-          if (info.sector) {
-            const sector = info.sector;
-            return isPointInsideOfRect(
-              [(localX / target.width) * 100, (localY / target.height) * 100],
-              sector
-            );
+          const clickedQuay = _find(quayPositionInfos, info => {
+            if (info.sector) {
+              const sector = info.sector;
+              return isPointInsideOfRect(
+                [(localX / target.width) * 100, (localY / target.height) * 100],
+                sector
+              );
+            }
+            return false;
+          });
+
+          if (clickedQuay) {
+            this.fabricCanvas.setCursor('pointer');
+          } else {
+            this.fabricCanvas.setCursor('default');
           }
-          return false;
-        });
-
-        if (clickedQuay) {
-          console.log(clickedQuay);
         }
       });
+
+      this.fabricCanvas.on('mouse:down', opt => {
+        const target = opt.target;
+        if (target) {
+          const { x: localX, y: localY } = target.getLocalPointer(opt.e);
+
+          const clickedQuay = _find(quayPositionInfos, info => {
+            if (info.sector) {
+              const sector = info.sector;
+              return isPointInsideOfRect(
+                [(localX / target.width) * 100, (localY / target.height) * 100],
+                sector
+              );
+            }
+            return false;
+          });
+
+          if (clickedQuay) {
+            this.quayClickEvent.next({
+              quayName: clickedQuay.quayName,
+              quayDesc: clickedQuay.quayDesc
+            });
+          }
+        }
+      });
+
+      this.quayClickEvent
+        .pipe(distinctUntilChanged())
+        .subscribe(_ => console.log(_));
     });
   }
 }
