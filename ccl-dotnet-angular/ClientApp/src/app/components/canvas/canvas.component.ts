@@ -64,6 +64,7 @@ export interface QuayClickEvent {
 export interface QuayMooringPopupInfo {
   quayName: string;
   quayDesc: string;
+  projNum?: string;
   realWindSpeed?: number;
   maxWindSpeed?: number;
   satisfiedWindSpeed?: number;
@@ -193,6 +194,7 @@ export class CanvasComponent implements OnInit {
         const canvasWidth = screenWidth;
         const canvasHeight = screenHeight;
         const quayMooringDict = _keyBy(quayMooringSchedules, 'quay_name');
+        console.log(quayMooringDict);
         if (this.fabricCanvas) {
           this.fabricCanvas.dispose();
           this.popup.nativeElement.style.display = 'none';
@@ -550,6 +552,7 @@ export class CanvasComponent implements OnInit {
             const { quayName, quayDesc } = clickedQuay;
             if (quayMooringDict[quayName]) {
               const {
+                proj_no,
                 real_wdsp,
                 real_moor_dwg,
                 max_wdsp,
@@ -560,6 +563,7 @@ export class CanvasComponent implements OnInit {
               return {
                 quayName: quayName,
                 quayDesc: quayDesc,
+                projNum: proj_no,
                 realWindSpeed: real_wdsp,
                 maxWindSpeed: max_wdsp,
                 satisfiedWindSpeed: sfty_wdsp,

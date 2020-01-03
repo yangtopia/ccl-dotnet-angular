@@ -10,11 +10,14 @@
 <div #popup class="quay-popup">
   <table class="table">
     <colgroup>
-      <col width="40%">
+      <col width="40%" />
     </colgroup>
     <thead>
       <tr>
-        <th>{{ (quayMooringPopupInfo$ | async)?.quayDesc }}</th>
+        <th>
+          {{ (quayMooringPopupInfo$ | async)?.quayDesc }} <br />
+          {{ (quayMooringPopupInfo$ | async)?.projNum }}
+        </th>
         <th>풍속</th>
         <th>도면</th>
       </tr>
