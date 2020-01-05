@@ -97,4 +97,5 @@ export interface QuayMooringInfo {
   mnt_date?: string;
   mnt_time?: string;
   mnt_user_id?: string;
+  mooringStatus?: 'GREEN' | 'ORANGE' | 'RED';
 }

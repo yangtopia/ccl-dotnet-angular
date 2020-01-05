@@ -7,12 +7,15 @@ import {
   ViewChild
 } from '@angular/core';
 import { fabric } from 'fabric';
-import { Canvas, IEvent } from 'fabric/fabric-impl';
+import { Canvas, IEvent, IPathOptions } from 'fabric/fabric-impl';
 import _find from 'lodash/find';
 import _isUndefined from 'lodash/isUndefined';
 import _keyBy from 'lodash/keyBy';
 import _range from 'lodash/range';
 import _countBy from 'lodash/countBy';
+import _mapValues from 'lodash/mapValues';
+import _groupBy from 'lodash/groupBy';
+import _get from 'lodash/get';
 import {
   combineLatest,
   fromEvent,
@@ -51,6 +54,10 @@ export interface QuayInfo {
   quayDesc: string;
   origin: QuayOriginInfo;
   sector?: [number, number][];
+  isVertical?: boolean;
+  projNum?: string;
+  alongside?: 'Stbd' | 'Port';
+  mooringStatus?: 'GREEN' | 'ORANGE' | 'RED';
 }
 
 export interface CanvasInput<T> {
@@ -213,18 +220,20 @@ export class CanvasComponent implements OnInit {
             total: 0
           };
         }
-        const satisfiedCount = _countBy(schedules, schedule => {
-          return schedule.real_wdsp >= this.typhoonSpeed;
-        })['true'] || 0;
+        const satisfiedCount =
+          _countBy(schedules, schedule => {
+            return schedule.real_wdsp >= this.typhoonSpeed;
+          })['true'] || 0;
 
-        const impossibleCount = _countBy(schedules, schedule => {
-          const { real_wdsp, max_wdsp, sfty_wdsp } = schedule;
-          return (
-            real_wdsp < this.typhoonSpeed &&
-            max_wdsp < this.typhoonSpeed &&
-            sfty_wdsp < this.typhoonSpeed
-          );
-        })['true'] || 0;
+        const impossibleCount =
+          _countBy(schedules, schedule => {
+            const { real_wdsp, max_wdsp, sfty_wdsp } = schedule;
+            return (
+              real_wdsp < this.typhoonSpeed &&
+              max_wdsp < this.typhoonSpeed &&
+              sfty_wdsp < this.typhoonSpeed
+            );
+          })['true'] || 0;
 
         return {
           satisfiedCount: satisfiedCount,
@@ -241,7 +250,29 @@ export class CanvasComponent implements OnInit {
       ([[screenWidth, screenHeight], quayMooringSchedules]) => {
         const canvasWidth = screenWidth;
         const canvasHeight = screenHeight;
-        const quayMooringDict = _keyBy(quayMooringSchedules, 'quay_name');
+        const quayMooringDict = _mapValues(
+          _keyBy(quayMooringSchedules, 'quay_name'),
+          v => {
+            const color = (() => {
+              if (v.real_wdsp >= this.typhoonSpeed) {
+                return 'GREEN';
+              } else if (
+                v.max_wdsp >= this.typhoonSpeed ||
+                v.sfty_wdsp >= this.typhoonSpeed
+              ) {
+                return 'ORANGE';
+              } else if (
+                v.real_wdsp < this.typhoonSpeed &&
+                v.max_wdsp < this.typhoonSpeed &&
+                v.sfty_wdsp < this.typhoonSpeed
+              ) {
+                return 'RED';
+              }
+            })();
+            const copy = { ...v, mooringStatus: color };
+            return copy;
+          }
+        );
 
         if (this.fabricCanvas) {
           this.fabricCanvas.dispose();
@@ -426,7 +457,18 @@ export class CanvasComponent implements OnInit {
           });
         });
 
-        const quayPositionInfos = QUAY_INFOS;
+        const quayPositionInfos = QUAY_INFOS.map(info => {
+          const mooringInfo = quayMooringDict[info.quayName];
+          if (mooringInfo) {
+            return {
+              ...info,
+              projNum: mooringInfo.proj_no,
+              alongside: mooringInfo.alsd_dirt,
+              mooringStatus: mooringInfo.mooringStatus
+            };
+          }
+          return info;
+        });
 
         const getNewCoordByDegree = ({
           originX,
@@ -494,13 +536,84 @@ export class CanvasComponent implements OnInit {
 
         const quayPositionSectorPolyLines = pointedQuayPositionInfos.map(
           (info, idx) => {
-            return new fabric.Polyline(info.points, {
+            const polyline = new fabric.Polyline(info.points, {
               fill: 'rgba(90, 142, 162, 0.4)',
               stroke: '#85fff5',
               angle: -50.8 - (!info.origin.degree ? 0 : info.origin.degree)
             });
+            return polyline;
           }
         );
+
+        const pathLiteral = `M4205 4823 c-110 -1 -375 -7 -590 -13 -214 -6 -579 -15 -810 -20
+            -231 -6 -573 -15 -760 -21 -187 -6 -549 -14 -805 -19 -608 -11 -604 -10 -1038
+            -220 l-202 -99 0 -1235 0 -1236 148 -74 c316 -158 469 -212 662 -235 47 -5
+            290 -12 540 -16 250 -3 586 -10 745 -15 740 -26 2473 -52 2955 -45 461 7 1272
+            31 1545 45 1594 86 2779 249 3765 519 444 122 722 216 1060 361 157 67 233 97
+            440 170 403 143 668 266 817 380 138 104 151 159 60 247 -104 101 -430 271
+            -762 398 -33 12 -96 37 -140 55 -44 18 -154 61 -245 95 -91 35 -244 96 -340
+            135 -202 82 -451 167 -700 238 -1165 334 -2488 509 -4389 582 -345 13 -1302
+            30 -1561 27 -107 -1 -285 -3 -395 -4z`;
+
+        const quayPositionShipPolyLines = pointedQuayPositionInfos
+          .filter(info => {
+            // console.log(info);
+            // return quayMooringDict[info.quayName];
+            // return info.quayName === 'H31';
+            return true;
+          })
+          .map((info, idx) => {
+            const color = (() => {
+              switch (info.mooringStatus) {
+                case 'GREEN':
+                  return '#32cd32';
+                case 'ORANGE':
+                  return '#ffa500';
+                case 'RED':
+                  return '#ff4500';
+                default:
+                  return 'black';
+              }
+            })();
+
+            const { quayName, alongside, projNum, isVertical } = info;
+            const { width, height, originX, originY } = info.origin;
+            const opt: IPathOptions = (() => {
+              if (isVertical) {
+                return {
+                  left: getX(originY - 10, canvasHeight),
+                  top: getY(
+                    originX - 30,
+                    canvasWidth,
+                    (this.ratioX * canvasHeight) / canvasWidth
+                  ),
+                  scaleY: 0.003,
+                  scaleX: 0.003,
+                  angle: 39.5 + 90 + 180
+                };
+              } else {
+                return {
+                  left: getX(originY - 10, canvasHeight),
+                  top: getY(
+                    originX - 30,
+                    canvasWidth,
+                    (this.ratioX * canvasHeight) / canvasWidth
+                  ),
+                  scaleX: 0.0000155 * width * (canvasHeight / 1000),
+                  scaleY: 0.00005 * height * (canvasHeight / 1000),
+                  angle: 39.5 - _get(info.origin, 'degree', 0)
+                };
+              }
+            })();
+
+            const pathOption = {
+              fill: color,
+              flipX: alongside === 'Port' ? true : false,
+              ...opt
+            };
+
+            return new fabric.Path(pathLiteral, pathOption);
+          });
 
         const groupOfBackgroundMap = new fabric.Group(
           [
@@ -512,6 +625,7 @@ export class CanvasComponent implements OnInit {
             ...roadCenterLinePolyLines,
             // ...quayNameSectorPolyLines,
             ...quayPositionSectorPolyLines,
+            ...quayPositionShipPolyLines,
             ...quayNameTexts
           ],
           {
@@ -575,6 +689,8 @@ export class CanvasComponent implements OnInit {
               }
               return false;
             });
+
+            console.log(clickedQuay);
 
             if (clickedQuay && quayMooringDict[clickedQuay.quayName]) {
               this.quayClickEvent.next({
