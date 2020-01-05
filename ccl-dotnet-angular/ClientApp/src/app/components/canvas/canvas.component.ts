@@ -16,6 +16,8 @@ import _countBy from 'lodash/countBy';
 import _mapValues from 'lodash/mapValues';
 import _groupBy from 'lodash/groupBy';
 import _get from 'lodash/get';
+import _flatMap from 'lodash/flatMap';
+import _flatten from 'lodash/flatten';
 import {
   combineLatest,
   fromEvent,
@@ -55,6 +57,13 @@ export interface QuayInfo {
   origin: QuayOriginInfo;
   sector?: [number, number][];
   isVertical?: boolean;
+  shipOrigins?: {
+    originX: number;
+    originY: number;
+    scaleX: number;
+    scaleY: number;
+    angle: number;
+  }[];
   projNum?: string;
   alongside?: 'Stbd' | 'Port';
   mooringStatus?: 'GREEN' | 'ORANGE' | 'RED';
@@ -556,11 +565,11 @@ export class CanvasComponent implements OnInit {
             30 -1561 27 -107 -1 -285 -3 -395 -4z`;
 
         const quayPositionShipPolyLines = pointedQuayPositionInfos
-          .filter(info => {
+          .filter((info, idx) => {
             // console.log(info);
-            // return quayMooringDict[info.quayName];
+            return quayMooringDict[info.quayName];
             // return info.quayName === 'H31';
-            return true;
+            // return true;
           })
           .map((info, idx) => {
             const color = (() => {
@@ -576,43 +585,35 @@ export class CanvasComponent implements OnInit {
               }
             })();
 
-            const { quayName, alongside, projNum, isVertical } = info;
-            const { width, height, originX, originY } = info.origin;
-            const opt: IPathOptions = (() => {
-              if (isVertical) {
-                return {
-                  left: getX(originY - 10, canvasHeight),
+            const {
+              quayName,
+              alongside,
+              projNum,
+              isVertical,
+              shipOrigins
+            } = info;
+            const opts: IPathOptions[] = (() => {
+              return _flatMap(shipOrigins, shipOrigin => {
+                const { originX, originY, scaleX, scaleY } = shipOrigin;
+                const pathOption = {
+                  fill: color,
+                  flipX: alongside === 'Port' ? true : false,
+                  left: getX(originY, canvasHeight),
                   top: getY(
-                    originX - 30,
+                    originX,
                     canvasWidth,
                     (this.ratioX * canvasHeight) / canvasWidth
                   ),
-                  scaleY: 0.003,
-                  scaleX: 0.003,
-                  angle: 39.5 + 90 + 180
-                };
-              } else {
-                return {
-                  left: getX(originY - 10, canvasHeight),
-                  top: getY(
-                    originX - 30,
-                    canvasWidth,
-                    (this.ratioX * canvasHeight) / canvasWidth
-                  ),
-                  scaleX: 0.0000155 * width * (canvasHeight / 1000),
-                  scaleY: 0.00005 * height * (canvasHeight / 1000),
+                  scaleX: scaleX * (canvasHeight / 1000),
+                  scaleY: scaleY * (canvasHeight / 1000),
                   angle: 39.5 - _get(info.origin, 'degree', 0)
                 };
-              }
+
+                return pathOption;
+              });
             })();
 
-            const pathOption = {
-              fill: color,
-              flipX: alongside === 'Port' ? true : false,
-              ...opt
-            };
-
-            return new fabric.Path(pathLiteral, pathOption);
+            return opts.map(opt => new fabric.Path(pathLiteral, opt));
           });
 
         const groupOfBackgroundMap = new fabric.Group(
@@ -625,7 +626,7 @@ export class CanvasComponent implements OnInit {
             ...roadCenterLinePolyLines,
             // ...quayNameSectorPolyLines,
             ...quayPositionSectorPolyLines,
-            ...quayPositionShipPolyLines,
+            ..._flatten(quayPositionShipPolyLines),
             ...quayNameTexts
           ],
           {
