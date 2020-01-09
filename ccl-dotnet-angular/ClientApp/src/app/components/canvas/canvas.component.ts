@@ -57,12 +57,14 @@ export interface QuayInfo {
   origin: QuayOriginInfo;
   sector?: [number, number][];
   isVertical?: boolean;
+  isRightSide?: boolean;
   shipOrigins?: {
     originX: number;
     originY: number;
     scaleX: number;
     scaleY: number;
-    angle: number;
+    numX?: number;
+    numY?: number;
   }[];
   projNum?: string;
   alongside?: 'Stbd' | 'Port';
@@ -567,9 +569,9 @@ export class CanvasComponent implements OnInit {
         const quayPositionShipPolyLines = pointedQuayPositionInfos
           .filter((info, idx) => {
             // console.log(info);
-            return quayMooringDict[info.quayName];
-            // return info.quayName === 'H31';
-            // return true;
+            // return quayMooringDict[info.quayName];
+            // return info.quayName === 'A32';
+            return true;
           })
           .map((info, idx) => {
             const color = (() => {
@@ -581,39 +583,84 @@ export class CanvasComponent implements OnInit {
                 case 'RED':
                   return '#ff4500';
                 default:
-                  return 'black';
+                  return 'yellow';
               }
             })();
 
             const {
               quayName,
-              alongside,
-              projNum,
-              isVertical,
-              shipOrigins
+              alongside = 'Port',
+              projNum = '0000',
+              isVertical = false,
+              isRightSide = false,
+              shipOrigins,
+              origin,
+              points
             } = info;
-            const opts: IPathOptions[] = (() => {
+
+            const shipObjects = (() => {
+              const addtionalOption = (() => {
+                const isAlongsidePort = alongside === 'Port';
+                if (!isVertical && !isRightSide) {
+                  return {
+                    flipX: isAlongsidePort
+                  };
+                } else if (!isVertical && isRightSide) {
+                  return {
+                    flipX: !isAlongsidePort
+                  };
+                } else if (isVertical && !isRightSide) {
+                  return {
+                    flipX: !isAlongsidePort,
+                    angle: 129
+                  };
+                } else if (isVertical && isRightSide) {
+                  return {
+                    flipX: isAlongsidePort,
+                    angle: 129
+                  };
+                }
+              })();
+
               return _flatMap(shipOrigins, shipOrigin => {
                 const { originX, originY, scaleX, scaleY } = shipOrigin;
-                const pathOption = {
+
+                const left = getX(originY, canvasHeight);
+                const top = getY(
+                  originX,
+                  canvasWidth,
+                  (this.ratioX * canvasHeight) / canvasWidth
+                );
+                const angle = 39.5 - _get(info.origin, 'degree', 0);
+
+                const pathOption: IPathOptions = {
+                  stroke: 'black',
+                  strokeWidth: 50,
                   fill: color,
-                  flipX: alongside === 'Port' ? true : false,
-                  left: getX(originY, canvasHeight),
-                  top: getY(
-                    originX,
-                    canvasWidth,
-                    (this.ratioX * canvasHeight) / canvasWidth
-                  ),
+                  left,
+                  top,
                   scaleX: scaleX * (canvasHeight / 1000),
                   scaleY: scaleY * (canvasHeight / 1000),
-                  angle: 39.5 - _get(info.origin, 'degree', 0)
+                  angle,
+                  ...addtionalOption
                 };
 
-                return pathOption;
+                const shipShape = new fabric.Path(pathLiteral, pathOption);
+                const shipNumber = new fabric.Text(projNum, {
+                  left,
+                  top,
+                  angle,
+                  fontSize: 9 * (canvasHeight / 1000),
+                  fontFamily: 'Arial',
+                  ...addtionalOption,
+                  flipX: false
+                })
+
+                return [shipShape, shipNumber];
               });
             })();
 
-            return opts.map(opt => new fabric.Path(pathLiteral, opt));
+            return _flatten(shipObjects);
           });
 
         const groupOfBackgroundMap = new fabric.Group(
@@ -635,7 +682,7 @@ export class CanvasComponent implements OnInit {
             hasControls: false,
             angle: -39.5,
             top: canvasHeight * 0.5,
-            left: canvasWidth * 0.1
+            left: canvasWidth * 0.01
           }
         );
 
@@ -691,7 +738,7 @@ export class CanvasComponent implements OnInit {
               return false;
             });
 
-            console.log(clickedQuay);
+            // console.log(clickedQuay);
 
             if (clickedQuay && quayMooringDict[clickedQuay.quayName]) {
               this.quayClickEvent.next({
