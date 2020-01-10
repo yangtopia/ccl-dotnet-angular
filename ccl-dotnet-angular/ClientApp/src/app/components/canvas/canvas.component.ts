@@ -569,9 +569,9 @@ export class CanvasComponent implements OnInit {
         const quayPositionShipPolyLines = pointedQuayPositionInfos
           .filter((info, idx) => {
             // console.log(info);
-            // return quayMooringDict[info.quayName];
+            return quayMooringDict[info.quayName];
             // return info.quayName === 'A32';
-            return true;
+            // return true;
           })
           .map((info, idx) => {
             const color = (() => {
@@ -623,22 +623,27 @@ export class CanvasComponent implements OnInit {
               })();
 
               return _flatMap(shipOrigins, shipOrigin => {
-                const { originX, originY, scaleX, scaleY } = shipOrigin;
-
-                const left = getX(originY, canvasHeight);
-                const top = getY(
+                const {
                   originX,
-                  canvasWidth,
-                  (this.ratioX * canvasHeight) / canvasWidth
-                );
+                  originY,
+                  scaleX,
+                  scaleY,
+                  numX,
+                  numY
+                } = shipOrigin;
+
                 const angle = 39.5 - _get(info.origin, 'degree', 0);
 
                 const pathOption: IPathOptions = {
                   stroke: 'black',
                   strokeWidth: 50,
                   fill: color,
-                  left,
-                  top,
+                  left: getX(originY, canvasHeight),
+                  top: getY(
+                    originX,
+                    canvasWidth,
+                    (this.ratioX * canvasHeight) / canvasWidth
+                  ),
                   scaleX: scaleX * (canvasHeight / 1000),
                   scaleY: scaleY * (canvasHeight / 1000),
                   angle,
@@ -646,15 +651,20 @@ export class CanvasComponent implements OnInit {
                 };
 
                 const shipShape = new fabric.Path(pathLiteral, pathOption);
+
                 const shipNumber = new fabric.Text(projNum, {
-                  left,
-                  top,
+                  left: getX(numY || originY, canvasHeight),
+                  top: getY(
+                    numX || originX,
+                    canvasWidth,
+                    (this.ratioX * canvasHeight) / canvasWidth
+                  ),
                   angle,
                   fontSize: 9 * (canvasHeight / 1000),
                   fontFamily: 'Arial',
                   ...addtionalOption,
                   flipX: false
-                })
+                });
 
                 return [shipShape, shipNumber];
               });
@@ -738,7 +748,7 @@ export class CanvasComponent implements OnInit {
               return false;
             });
 
-            // console.log(clickedQuay);
+            console.log(clickedQuay);
 
             if (clickedQuay && quayMooringDict[clickedQuay.quayName]) {
               this.quayClickEvent.next({
