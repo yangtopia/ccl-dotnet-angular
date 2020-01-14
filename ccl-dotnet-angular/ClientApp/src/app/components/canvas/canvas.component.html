@@ -33,7 +33,9 @@
           {{ (quayMooringPopupInfo$ | async)?.realWindSpeed }}
         </td>
         <td>
-          {{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}
+          <a href="assets/pdf/ship_dwg_sample.pdf" target="_blank">
+            {{ (quayMooringPopupInfo$ | async)?.realMoorDrawing ? '도면' : '-' }}
+          </a>
         </td>
       </tr>
       <tr>
@@ -45,7 +47,11 @@
         >
           {{ (quayMooringPopupInfo$ | async)?.maxWindSpeed }}
         </td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.realMoorDrawing }}</td>
+        <td>
+          <a href="assets/pdf/ship_dwg_sample.pdf" target="_blank">
+            {{ (quayMooringPopupInfo$ | async)?.maxMoorDrawing ? '도면' : '-' }}
+          </a>
+        </td>
       </tr>
       <tr>
         <td>태풍</td>
