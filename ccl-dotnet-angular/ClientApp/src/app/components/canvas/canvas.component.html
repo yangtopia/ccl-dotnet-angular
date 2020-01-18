@@ -33,9 +33,17 @@
           {{ (quayMooringPopupInfo$ | async)?.realWindSpeed }}
         </td>
         <td>
-          <a href="assets/pdf/ship_dwg_sample.pdf" target="_blank">
-            {{ (quayMooringPopupInfo$ | async)?.realMoorDrawing ? '도면' : '-' }}
+          <a
+            *ngIf="
+              (quayMooringPopupInfo$ | async)?.realMoorDrawing;
+              else nothing
+            "
+            [href]="(quayMooringPopupInfo$ | async)?.realMoorDrawing"
+            target="_blank"
+          >
+            도면
           </a>
+          <ng-template #nothing>-</ng-template>
         </td>
       </tr>
       <tr>
@@ -48,15 +56,35 @@
           {{ (quayMooringPopupInfo$ | async)?.maxWindSpeed }}
         </td>
         <td>
-          <a href="assets/pdf/ship_dwg_sample.pdf" target="_blank">
-            {{ (quayMooringPopupInfo$ | async)?.maxMoorDrawing ? '도면' : '-' }}
+          <a
+            *ngIf="
+              (quayMooringPopupInfo$ | async)?.maxMoorDrawing;
+              else nothing
+            "
+            [href]="(quayMooringPopupInfo$ | async)?.maxMoorDrawing"
+            target="_blank"
+          >
+            도면
           </a>
+          <ng-template #nothing>-</ng-template>
         </td>
       </tr>
       <tr>
         <td>태풍</td>
         <td>{{ (quayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}</td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing }}</td>
+        <td>
+          <a
+            *ngIf="
+              (quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing;
+              else nothing
+            "
+            [href]="(quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing"
+            target="_blank"
+          >
+            도면
+          </a>
+          <ng-template #nothing>-</ng-template>
+        </td>
       </tr>
     </tbody>
   </table>

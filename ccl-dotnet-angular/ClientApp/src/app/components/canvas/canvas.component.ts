@@ -740,8 +740,6 @@ export class CanvasComponent implements OnInit {
           if (target) {
             const { x: localX, y: localY } = target.getLocalPointer(opt.e);
 
-            console.log(localX, localY);
-
             const clickedQuay = _find(quayPositionInfos, info => {
               if (info.sector) {
                 const sector = info.sector;
@@ -815,9 +813,9 @@ export class CanvasComponent implements OnInit {
                 maxWindSpeed: max_wdsp || '-',
                 maxWindColor: !max_wdsp ? '#fff' : color,
                 satisfiedWindSpeed: sfty_wdsp || '-',
-                realMoorDrawing: real_moor_dwg || '-',
-                maxMoorDrawing: max_moor_dwg || '-',
-                satisfiedMoorDrawing: sfty_moor_dwg || '-'
+                realMoorDrawing: real_moor_dwg,
+                maxMoorDrawing: max_moor_dwg,
+                satisfiedMoorDrawing: sfty_moor_dwg
               };
             } else {
               return {
