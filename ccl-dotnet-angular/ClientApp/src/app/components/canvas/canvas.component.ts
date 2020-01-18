@@ -690,8 +690,8 @@ export class CanvasComponent implements OnInit {
           ],
           {
             selectable: true,
-            hasBorders: true,
-            hasControls: true,
+            hasBorders: false,
+            hasControls: false,
             angle: -39.5,
           }
         );
