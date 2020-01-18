@@ -820,6 +820,7 @@ export class CanvasComponent implements OnInit {
                 maxWindSpeed: max_wdsp || '-',
                 maxWindColor: !max_wdsp ? '#fff' : color,
                 satisfiedWindSpeed: sfty_wdsp || '-',
+                satisfiedWindColor: !sfty_wdsp ? '#fff' : color,
                 realMoorDrawing: real_moor_dwg,
                 maxMoorDrawing: max_moor_dwg,
                 satisfiedMoorDrawing: sfty_moor_dwg

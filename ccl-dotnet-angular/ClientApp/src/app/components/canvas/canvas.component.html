@@ -71,7 +71,14 @@
       </tr>
       <tr>
         <td>태풍</td>
-        <td>{{ (quayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}</td>
+        <td
+          [ngStyle]="{
+            'background-color': (quayMooringPopupInfo$ | async)
+              ?.satisfiedWindColor
+          }"
+        >
+          {{ (quayMooringPopupInfo$ | async)?.satisfiedWindSpeed }}
+        </td>
         <td>
           <a
             *ngIf="
