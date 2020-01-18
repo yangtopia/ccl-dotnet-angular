@@ -209,16 +209,23 @@ export class CanvasComponent implements OnInit {
       startWith([INITIAL_WIDTH, INITIAL_HEIGHT])
     );
 
-    const isZoomClicked$ = merge(
+    merge(
       this.zoomButtonClickEvent,
       this.panButtonClickEvent
-    );
-
-    isZoomClicked$.subscribe(isZoom => {
+    ).subscribe(isZoom => {
       const zoom = this.fabricCanvas.getZoom();
+      const modified = (() => {
+        if (isZoom) {
+          const z = zoom + 0.2;
+          return z > this.maxZoomLevel ? this.maxZoomLevel : z;
+        } else if (!isZoom) {
+          const z = zoom - 0.2;
+          return z < this.minZoomLevel ? this.minZoomLevel : z;
+        }
+      })();
       this.fabricCanvas.zoomToPoint(
         this.currentCenterPointer,
-        isZoom ? zoom + 0.2 : zoom - 0.2
+        modified
       );
     });
 
