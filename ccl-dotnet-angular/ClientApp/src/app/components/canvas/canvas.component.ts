@@ -65,6 +65,7 @@ export interface QuayInfo {
     scaleY: number;
     numX?: number;
     numY?: number;
+    numSize?: number;
   }[];
   projNum?: string;
   alongside?: 'Stbd' | 'Port';
@@ -463,7 +464,7 @@ export class CanvasComponent implements OnInit {
             left: textPosition.x,
             top: textPosition.y,
             angle: 39.5,
-            fontSize: 10,
+            fontSize: 10 * (canvasHeight / 1000),
             fontFamily: 'Arial'
           });
         });
@@ -629,7 +630,8 @@ export class CanvasComponent implements OnInit {
                   scaleX,
                   scaleY,
                   numX,
-                  numY
+                  numY,
+                  numSize
                 } = shipOrigin;
 
                 const angle = 39.5 - _get(info.origin, 'degree', 0);
@@ -660,7 +662,7 @@ export class CanvasComponent implements OnInit {
                     (this.ratioX * canvasHeight) / canvasWidth
                   ),
                   angle,
-                  fontSize: 9 * (canvasHeight / 1000),
+                  fontSize: (numSize || 9) * (canvasHeight / 1000),
                   fontFamily: 'Arial',
                   ...addtionalOption,
                   flipX: false
@@ -688,13 +690,17 @@ export class CanvasComponent implements OnInit {
           ],
           {
             selectable: true,
-            hasBorders: false,
-            hasControls: false,
+            hasBorders: true,
+            hasControls: true,
             angle: -39.5,
-            top: canvasHeight * 0.5,
-            left: canvasWidth * 0.01
           }
         );
+
+        groupOfBackgroundMap.set({
+          left: canvasWidth / 8,
+          top: canvasHeight / 2
+        });
+        groupOfBackgroundMap.setCoords();
 
         this.fabricCanvas.add(groupOfBackgroundMap);
 
@@ -734,6 +740,8 @@ export class CanvasComponent implements OnInit {
           if (target) {
             const { x: localX, y: localY } = target.getLocalPointer(opt.e);
 
+            console.log(localX, localY);
+
             const clickedQuay = _find(quayPositionInfos, info => {
               if (info.sector) {
                 const sector = info.sector;
@@ -747,8 +755,6 @@ export class CanvasComponent implements OnInit {
               }
               return false;
             });
-
-            console.log(clickedQuay);
 
             if (clickedQuay && quayMooringDict[clickedQuay.quayName]) {
               this.quayClickEvent.next({
