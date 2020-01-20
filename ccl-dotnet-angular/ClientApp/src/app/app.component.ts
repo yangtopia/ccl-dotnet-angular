@@ -55,8 +55,8 @@ export class AppComponent implements OnInit {
   @Select(QuayMooringInfoState.quayMooringInfos)
   quayMooringInfos$: Observable<QuayMooringInfo[]>;
 
-  MAX_ZOOM_LEVEL = 2;
-  MIN_ZOOM_LEVEL = 1;
+  MAX_ZOOM_LEVEL = 2.4;
+  MIN_ZOOM_LEVEL = 1.2;
 
   typhoonSpeed$: Observable<number>;
   yearOptions$: Observable<string[]>;

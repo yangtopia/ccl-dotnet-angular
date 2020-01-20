@@ -303,6 +303,7 @@ export class CanvasComponent implements OnInit {
         });
         this.fabricCanvas.setWidth(canvasWidth);
         this.fabricCanvas.setHeight(canvasHeight);
+        this.fabricCanvas.setZoom(this.minZoomLevel);
 
         if (_isUndefined(this.currentCenterPointer)) {
           this.currentCenterPointer = new fabric.Point(
@@ -697,15 +698,19 @@ export class CanvasComponent implements OnInit {
           ],
           {
             selectable: true,
-            hasBorders: false,
-            hasControls: false,
+            hasBorders: true,
+            hasControls: true,
             angle: -39.5,
           }
         );
 
+        const mapWidth = groupOfBackgroundMap.width * this.minZoomLevel;
+        const mapHeight = groupOfBackgroundMap.height * this.minZoomLevel;
+        const withOffset = Math.sqrt(Math.pow(mapWidth, 2) + Math.pow(mapHeight, 2)) * 1.05;
+
         groupOfBackgroundMap.set({
-          left: canvasWidth / 8,
-          top: canvasHeight / 2
+          left: (canvasWidth - withOffset) / 2,
+          top: canvasHeight / 2.2
         });
         groupOfBackgroundMap.setCoords();
 
