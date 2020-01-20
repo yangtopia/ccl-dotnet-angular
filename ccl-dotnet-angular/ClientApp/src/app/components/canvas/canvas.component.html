@@ -34,7 +34,9 @@
               (quayMooringPopupInfo$ | async)?.realMoorDrawing;
               else nothing
             "
-            [href]="(quayMooringPopupInfo$ | async)?.realMoorDrawing"
+            [href]="
+              'file://' + (quayMooringPopupInfo$ | async)?.realMoorDrawing
+            "
             target="_blank"
           >
             도면
@@ -53,7 +55,7 @@
               (quayMooringPopupInfo$ | async)?.maxMoorDrawing;
               else nothing
             "
-            [href]="(quayMooringPopupInfo$ | async)?.maxMoorDrawing"
+            [href]="'file://' + (quayMooringPopupInfo$ | async)?.maxMoorDrawing"
             target="_blank"
           >
             도면
@@ -72,7 +74,9 @@
               (quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing;
               else nothing
             "
-            [href]="(quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing"
+            [href]="
+              'file://' + (quayMooringPopupInfo$ | async)?.satisfiedMoorDrawing
+            "
             target="_blank"
           >
             도면
