@@ -12,6 +12,7 @@
   display: none;
   position: absolute;
   height: auto;
+  z-index: 1;
   .table {
     table-layout: fixed;
     margin-top: 0;
@@ -19,6 +20,18 @@
     th {
       vertical-align: middle;
     }
+  }
+}
+
+.popup-table {
+  td.code-green {
+    background-color: #80ff40;
+    font-weight: bold;
+  }
+  td.code-red {
+    background-color: #ff0000;;
+    color: white;
+    font-weight: bold;
   }
 }
 

@@ -1,46 +1,19 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { fabric } from 'fabric';
 import { Canvas, IEvent, IPathOptions } from 'fabric/fabric-impl';
-import _find from 'lodash/find';
-import _isUndefined from 'lodash/isUndefined';
-import _keyBy from 'lodash/keyBy';
-import _range from 'lodash/range';
 import _countBy from 'lodash/countBy';
-import _mapValues from 'lodash/mapValues';
-import _groupBy from 'lodash/groupBy';
-import _get from 'lodash/get';
+import _find from 'lodash/find';
 import _flatMap from 'lodash/flatMap';
 import _flatten from 'lodash/flatten';
-import {
-  combineLatest,
-  fromEvent,
-  merge,
-  Observable,
-  ReplaySubject,
-  Subject
-} from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  shareReplay,
-  startWith,
-  filter
-} from 'rxjs/operators';
+import _get from 'lodash/get';
+import _isUndefined from 'lodash/isUndefined';
+import _keyBy from 'lodash/keyBy';
+import _mapValues from 'lodash/mapValues';
+import _range from 'lodash/range';
+import { combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs/operators';
 import { QuayMooringInfo } from 'src/shared/serverModel.interface.js';
-import {
-  Coordinate,
-  GroupStyle,
-  LandScapeClass,
-  Road
-} from 'src/shared/shipyard.interface';
+import { Coordinate, GroupStyle, LandScapeClass, Road } from 'src/shared/shipyard.interface';
 import quays from '../../../assets/json/quays.json';
 
 export interface QuayOriginInfo {
@@ -87,11 +60,11 @@ export interface QuayMooringPopupInfo {
   quayDesc: string;
   projNum?: string;
   realWindSpeed?: number | string;
-  realWindColor?: string;
+  realWindClass?: string;
   maxWindSpeed?: number | string;
-  maxWindColor?: string;
+  maxWindClass?: string;
   satisfiedWindSpeed?: number | string;
-  satisfiedWindColor?: string;
+  satisfiedWindClass?: string;
   realMoorDrawing?: string;
   maxMoorDrawing?: string;
   satisfiedMoorDrawing?: string;
@@ -105,6 +78,9 @@ export interface QuayMooringResult {
 }
 
 const QUAY_INFOS = quays as QuayInfo[];
+const CODE_GREEN = '#80ff40';
+const CODE_ORANGE = '#ff8040';
+const CODE_RED = '#ff0000';
 
 @Component({
   selector: 'app-canvas',
@@ -586,11 +562,11 @@ export class CanvasComponent implements OnInit {
             const color = (() => {
               switch (info.mooringStatus) {
                 case 'GREEN':
-                  return '#32cd32';
+                  return CODE_GREEN;
                 case 'ORANGE':
-                  return '#ffa500';
+                  return CODE_ORANGE;
                 case 'RED':
-                  return '#ff4500';
+                  return CODE_RED;
                 default:
                   return 'yellow';
               }
@@ -698,8 +674,8 @@ export class CanvasComponent implements OnInit {
           ],
           {
             selectable: true,
-            hasBorders: true,
-            hasControls: true,
+            hasBorders: false,
+            hasControls: false,
             angle: -39.5,
           }
         );
@@ -801,31 +777,35 @@ export class CanvasComponent implements OnInit {
 
               const color = (() => {
                 if (real_wdsp >= this.typhoonSpeed) {
-                  return '#32cd32';
+                  return CODE_GREEN;
                 } else if (
                   max_wdsp >= this.typhoonSpeed ||
                   sfty_wdsp >= this.typhoonSpeed
                 ) {
-                  return '#ffa500';
+                  return CODE_ORANGE;
                 } else if (
                   real_wdsp < this.typhoonSpeed &&
                   max_wdsp < this.typhoonSpeed &&
                   sfty_wdsp < this.typhoonSpeed
                 ) {
-                  return '#ff4500';
+                  return CODE_RED;
                 }
               })();
+
+              const getClassByWindSpeed = (speed: number, typhoonSpeed: number) => {
+                return speed < typhoonSpeed ? 'code-red' : 'code-green';
+              }
 
               return {
                 quayName: quayName,
                 quayDesc: quayDesc,
                 projNum: proj_no,
                 realWindSpeed: real_wdsp || '-',
-                realWindColor: !real_wdsp ? '#fff' : color,
+                realWindClass: !real_wdsp ? 'code-none' : getClassByWindSpeed(real_wdsp, this.typhoonSpeed),
                 maxWindSpeed: max_wdsp || '-',
-                maxWindColor: !max_wdsp ? '#fff' : color,
+                maxWindClass: !max_wdsp ? 'code-none' : getClassByWindSpeed(max_wdsp, this.typhoonSpeed),
                 satisfiedWindSpeed: sfty_wdsp || '-',
-                satisfiedWindColor: !sfty_wdsp ? '#fff' : color,
+                satisfiedWindClass: !sfty_wdsp ? 'code-none' : getClassByWindSpeed(sfty_wdsp, this.typhoonSpeed),
                 realMoorDrawing: real_moor_dwg,
                 maxMoorDrawing: max_moor_dwg,
                 satisfiedMoorDrawing: sfty_moor_dwg
