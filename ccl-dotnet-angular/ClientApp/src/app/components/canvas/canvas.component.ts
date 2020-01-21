@@ -296,7 +296,7 @@ export class CanvasComponent implements OnInit {
           this.currentCenterPointer = fe.pointer;
 
           const e = fe.e as WheelEvent;
-          const delta = e.deltaY;
+          const delta = -e.deltaY; // windows 사용자 우선을 위해 역방향 스크롤줌 설정
           let zoom = this.fabricCanvas.getZoom();
           zoom = zoom + delta / 200;
           if (zoom > this.maxZoomLevel) {

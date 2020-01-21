@@ -31,6 +31,8 @@ export class ControlPanelComponent {
   @Output() typhoonChange = new EventEmitter<TyphoonOption>();
   @Output() scheduleChange = new EventEmitter<string>();
 
+  currentYear = new Date().getFullYear();
+
   changeYear(year: string): void {
     this.yearChange.emit(year);
   }
