@@ -30,7 +30,7 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM NH820M";
+          var query = "SELECT * FROM AP.NH820M";
           result = SqlMapper.Query<QuayMooringInfo>(conn, query);
         }
       }
