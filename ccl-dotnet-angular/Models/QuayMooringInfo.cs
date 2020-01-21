@@ -13,8 +13,8 @@ namespace ccl_dotnet_angular.Models
 
     public int max_wdsp { get; set; }
     public string max_moor_dwg { get; set; }
-    public int sfty_wdsp { get; set; }
-    public string sfty_moor_dwg { get; set; }
+    public int tphn_stfc { get; set; }
+    public string stfc_moor_dwg { get; set; }
     public string status { get; set; }
     public string updt_indc { get; set; }
     public string rgsr_date { get; set; }

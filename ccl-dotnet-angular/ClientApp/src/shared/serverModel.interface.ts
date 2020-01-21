@@ -87,8 +87,8 @@ export interface QuayMooringInfo {
   real_moor_dwg?: string;
   max_wdsp: number;
   max_moor_dwg?: string;
-  sfty_wdsp: number;
-  sfty_moor_dwg?: string;
+  tphn_stfc: number;
+  stfc_moor_dwg?: string;
   status?: string;
   updt_indc?: string;
   rgsr_date: string;

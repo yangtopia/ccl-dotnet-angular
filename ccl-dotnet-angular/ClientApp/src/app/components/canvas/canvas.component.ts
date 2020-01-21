@@ -222,7 +222,7 @@ export class CanvasComponent implements OnInit {
 
         const impossibleCount =
           _countBy(schedules, schedule => {
-            const { real_wdsp, max_wdsp, sfty_wdsp } = schedule;
+            const { real_wdsp, max_wdsp, tphn_stfc: sfty_wdsp } = schedule;
             return (
               real_wdsp < this.typhoonSpeed &&
               max_wdsp < this.typhoonSpeed &&
@@ -253,13 +253,13 @@ export class CanvasComponent implements OnInit {
                 return 'GREEN';
               } else if (
                 v.max_wdsp >= this.typhoonSpeed ||
-                v.sfty_wdsp >= this.typhoonSpeed
+                v.tphn_stfc >= this.typhoonSpeed
               ) {
                 return 'ORANGE';
               } else if (
                 v.real_wdsp < this.typhoonSpeed &&
                 v.max_wdsp < this.typhoonSpeed &&
-                v.sfty_wdsp < this.typhoonSpeed
+                v.tphn_stfc < this.typhoonSpeed
               ) {
                 return 'RED';
               }
@@ -771,8 +771,8 @@ export class CanvasComponent implements OnInit {
                 real_moor_dwg,
                 max_wdsp,
                 max_moor_dwg,
-                sfty_wdsp,
-                sfty_moor_dwg
+                tphn_stfc: sfty_wdsp,
+                stfc_moor_dwg: sfty_moor_dwg
               } = quayMooringDict[clickedQuay.quayName];
 
               const color = (() => {
