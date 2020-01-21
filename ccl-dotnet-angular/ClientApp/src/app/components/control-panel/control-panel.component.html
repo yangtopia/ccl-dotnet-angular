@@ -18,7 +18,6 @@
           <clr-select-container>
             <label>년도</label>
             <select clrSelect (change)="changeYear($event.target.value)">
-              <option *ngIf="years.length === 0">{{ currentYear }}</option>
               <option *ngFor="let year of years" [value]="year">{{
                 year
               }}</option>
@@ -27,7 +26,6 @@
           <clr-select-container>
             <label>태풍정보</label>
             <select clrSelect (change)="changeTyphoon($event.target.value)">
-              <option *ngIf="typhoons.length === 0">정보없음</option>
               <option *ngFor="let typhoon of typhoons" [value]="typhoon.tphn_no"
                 >{{ typhoon.tphn_no }}호 {{ typhoon.tphn_name }}</option
               >

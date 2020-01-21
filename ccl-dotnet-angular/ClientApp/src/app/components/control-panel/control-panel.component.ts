@@ -1,12 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  ChangeDetectionStrategy,
-  Output,
-  EventEmitter
-} from '@angular/core';
-import _isEmpty from 'lodash/isEmpty';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 export interface TyphoonOption {
   year: string;
@@ -30,8 +22,6 @@ export class ControlPanelComponent {
   @Output() yearChange = new EventEmitter<string>();
   @Output() typhoonChange = new EventEmitter<TyphoonOption>();
   @Output() scheduleChange = new EventEmitter<string>();
-
-  currentYear = new Date().getFullYear();
 
   changeYear(year: string): void {
     this.yearChange.emit(year);
