@@ -59,7 +59,7 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM NH820M WHERE YEAR_TPHN_NO = :YEAR_TPHN_NO ORDER BY MNTH_DATE DESC, REV_NUMB DESC";
+          var query = "SELECT * FROM AP.NH820M WHERE YEAR_TPHN_NO = :YEAR_TPHN_NO ORDER BY MNTH_DATE DESC, REV_NUMB DESC";
           result = SqlMapper.Query<QuayMooringInfo>(conn, query, dyParam);
         }
       }
