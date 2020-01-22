@@ -21,8 +21,8 @@ namespace ccl_dotnet_angular
         {
           // serverOptions
         })
-            // .UseIISIntegration()
-            .UseStartup<Startup>()
-            .UseUrls("http://localhost:8099");
+            .UseIISIntegration()
+            .UseStartup<Startup>();
+            // .UseUrls("http://localhost:8099");
   }
 }
