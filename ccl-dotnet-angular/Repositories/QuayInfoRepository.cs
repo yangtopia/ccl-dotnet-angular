@@ -30,7 +30,8 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM AP.NH810M";
+          var quayInfoTable = configuration.GetSection("OracleTables").GetSection("quayInfoTable").Value;
+          var query = $"SELECT * FROM {quayInfoTable}";
           result = SqlMapper.Query<QuayInfo>(conn, query);
         }
       }

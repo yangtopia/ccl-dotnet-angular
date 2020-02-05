@@ -1,9 +1,11 @@
 .contorl-panel {
+  display: flex;
   position: fixed;
+  justify-content: space-between;
+  // align-items: center;
   z-index: 1;
-  left: 5%;
-  width: 625px;
-  // max-width: 90%;
+  padding: 0 1.5%;
+  width: 100%;
   padding-top: 12px;
   .logo {
     color: black;
@@ -11,6 +13,7 @@
   }
   .card {
     margin-top: 5px;
+    width: 650px;
     .card-header {
       // display: flex;
       .controls-wrap {

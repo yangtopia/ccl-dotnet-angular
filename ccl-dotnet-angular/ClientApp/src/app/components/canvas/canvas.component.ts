@@ -663,7 +663,7 @@ export class CanvasComponent implements OnInit {
           [
             ...coastLinesPolylinePs,
             ...lotMiddlePolylines,
-            ...lotSmallPolylines,
+            // ...lotSmallPolylines,
             ...coastLinesPolylines,
             ...roadPolylines,
             ...roadCenterLinePolyLines,

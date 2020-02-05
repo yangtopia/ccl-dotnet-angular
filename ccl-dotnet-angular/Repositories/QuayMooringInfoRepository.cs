@@ -30,7 +30,8 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM AP.NH820M";
+          var quayMooringInfoTable = configuration.GetSection("OracleTables").GetSection("quayMooringInfoTable").Value;
+          var query = $"SELECT * FROM {quayMooringInfoTable}";
           result = SqlMapper.Query<QuayMooringInfo>(conn, query);
         }
       }
@@ -59,7 +60,8 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM AP.NH820M WHERE YEAR_TPHN_NO = :YEAR_TPHN_NO ORDER BY MNTH_DATE DESC, REV_NUMB DESC";
+          var quayMooringInfoTable = configuration.GetSection("OracleTables").GetSection("quayMooringInfoTable").Value;
+          var query = $"SELECT * FROM {quayMooringInfoTable} WHERE YEAR_TPHN_NO = :YEAR_TPHN_NO ORDER BY MNTH_DATE DESC, REV_NUMB DESC";
           result = SqlMapper.Query<QuayMooringInfo>(conn, query, dyParam);
         }
       }

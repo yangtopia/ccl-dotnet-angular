@@ -30,7 +30,8 @@ namespace ccl_dotnet_angular.Repositories
 
         if (conn.State == ConnectionState.Open)
         {
-          var query = "SELECT * FROM AP.NH800M ORDER BY YEAR DESC, TPHN_NO DESC";
+          var typhoonInfoTable = configuration.GetSection("OracleTables").GetSection("typhoonInfoTable").Value;
+          var query = $"SELECT * FROM {typhoonInfoTable} ORDER BY YEAR DESC, TPHN_NO DESC";
           result = SqlMapper.Query<TyphoonInfo>(conn, query);
         }
       }
