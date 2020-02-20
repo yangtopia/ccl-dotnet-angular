@@ -27,7 +27,7 @@ export class QuayMooringInfoState {
   }
 
   @Action(QuayMooringInfoActions.FetchQuayMooringInfos)
-  fetchTyphoonInfos(
+  fetchMooringInfos(
     ctx: StateContext<QuayMooringInfoStateModel>,
     action: QuayMooringInfoActions.FetchQuayMooringInfos
   ) {

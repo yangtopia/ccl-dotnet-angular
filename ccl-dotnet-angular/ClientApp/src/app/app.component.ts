@@ -6,12 +6,13 @@ import _has from 'lodash/has';
 import _head from 'lodash/head';
 import _isEmpty from 'lodash/isEmpty';
 import _keys from 'lodash/keys';
+import _mapKeys from 'lodash/mapKeys';
+import _mapValues from 'lodash/mapValues';
 import _uniq from 'lodash/uniq';
-import { Observable, Subject } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   filter,
   map,
-  shareReplay,
   startWith,
   switchMap,
   withLatestFrom
@@ -30,17 +31,13 @@ import {
   RoadGroup,
   ShipyardXML
 } from '../shared/shipyard.interface';
-import { QuayMooringInfoState } from '../store/quayMooringInfo.state';
-import { TyphoonInfoState } from '../store/typhoonInfo.state';
-import { CanvasInput } from './components/canvas/canvas.component';
-import { TyphoonOption } from './components/control-panel/control-panel.component.js';
-import * as TyphoonInfoActions from '../store/typhoonInfo.actions';
 import * as QuayInfoActions from '../store/quayInfo.actions';
 import * as QuayMooringInfoActions from '../store/quayMooringInfo.actions';
-import quays from '../assets/json/quays.json';
+import * as TyphoonInfoActions from '../store/typhoonInfo.actions';
+import { TyphoonInfoState } from '../store/typhoonInfo.state';
+import { CanvasInput } from './components/canvas/canvas.component';
 
 const SHIPYARD_XML = shipyard as ShipyardXML;
-const QUAY_INFOS = quays as QuayInfo[];
 
 @Component({
   selector: 'app-root',
@@ -52,20 +49,18 @@ export class AppComponent implements OnInit {
   typhoonInfos$: Observable<TyphoonInfo[]>;
   @Select(QuayInfoState.quayInfos)
   quayInfos$: Observable<QuayInfo[]>;
-  @Select(QuayMooringInfoState.quayMooringInfos)
-  quayMooringInfos$: Observable<QuayMooringInfo[]>;
 
   MAX_ZOOM_LEVEL = 2.4;
   MIN_ZOOM_LEVEL = 1.2;
 
   typhoonSpeed$: Observable<number>;
   yearOptions$: Observable<string[]>;
-  typhoonOptions$: Observable<TyphoonOption[]>;
+  typhoonOptions$: Observable<string[]>;
   schedulesOptions$: Observable<string[]>;
   quayMooringSchedules$: Observable<QuayMooringInfo[]>;
 
   yearChangeEvent = new Subject<string>();
-  typhoonChangeEvent = new Subject<TyphoonOption>();
+  typhoonChangeEvent = new Subject<string>();
   scheduleChangeEvent = new Subject<string>();
 
   lotSmalls: CanvasInput<LandScapeClass[]>;
@@ -169,20 +164,24 @@ export class AppComponent implements OnInit {
       })
     );
 
-    const typhoonOptions$ = typhoonInfosBySelectedYear$.pipe(
-      map(typhoonInfos => {
-        return typhoonInfos.map(info => ({
-          year: info.year,
-          tphn_spd: info.tphn_spd,
-          tphn_no: info.tphn_no,
-          tphn_name: info.tphn_name
-        }));
-      }),
-      shareReplay(1)
+    const typhoonScheduleOptionDict$ = typhoonInfosBySelectedYear$.pipe(
+      map(infos => {
+        const groupedTyphoonInfos = _groupBy(infos, info => {
+          return `${info.tphn_no.split('_')[0]}호_${info.tphn_name}`;
+        });
+        return _mapValues(groupedTyphoonInfos, infos => {
+          return _mapKeys(infos, info => {
+            const month = info.mnth_date.substr(0, 2);
+            const date = info.mnth_date.substr(2, 2);
+            const [_, revisionNumber] = info.tphn_no.split('_');
+            return `${month}-${date}-R${revisionNumber}`;
+          });
+        });
+      })
     );
 
-    const typhoonSpeed$ = typhoonOptions$.pipe(
-      map(opts => _head(opts).tphn_spd)
+    const typhoonOptions$ = typhoonScheduleOptionDict$.pipe(
+      map(dict => _keys(dict))
     );
 
     const currentSelectedTyphoonOption$ = typhoonOptions$.pipe(
@@ -193,32 +192,12 @@ export class AppComponent implements OnInit {
       filter(opt => !_isEmpty(opt))
     );
 
-    const quayMooringInfoParam$ = currentSelectedTyphoonOption$.pipe(
-      map(selectedTyphoonOpt => {
-        return `${selectedTyphoonOpt.year}_${selectedTyphoonOpt.tphn_no}`;
-      })
-    );
-
-    quayMooringInfoParam$.subscribe(param => {
-      this.store.dispatch(
-        new QuayMooringInfoActions.FetchQuayMooringInfos(param)
-      );
-    });
-
-    const scheduleDict$ = this.quayMooringInfos$.pipe(
-      map(infos => {
-        const groupedBySchedule = _groupBy(infos, info => {
-          const month = info.mnth_date.substr(0, 2);
-          const date = info.mnth_date.substr(2, 2);
-          return `${month}-${date}-R${info.rev_numb}`;
-        });
-        return groupedBySchedule;
+    const scheduleOptions$ = currentSelectedTyphoonOption$.pipe(
+      withLatestFrom(typhoonScheduleOptionDict$),
+      map(([currentSelectedTyphoon, dict]) => {
+        return _keys(dict[currentSelectedTyphoon]);
       }),
-      shareReplay(1)
-    );
-
-    const scheduleOptions$ = scheduleDict$.pipe(
-      map(scheduleDict => _keys(scheduleDict))
+      startWith([])
     );
 
     const currentSelectedScheduleOption$ = scheduleOptions$.pipe(
@@ -228,18 +207,36 @@ export class AppComponent implements OnInit {
       })
     );
 
-    const currentQuayMooringSchedule$ = currentSelectedScheduleOption$.pipe(
-      withLatestFrom(scheduleDict$),
-      map(([selectedScheduleOption, scheduleDict]) => {
-        return scheduleDict[selectedScheduleOption];
+    const currentSelectedTyphoonSchedule$ = combineLatest(
+      currentSelectedTyphoonOption$,
+      currentSelectedScheduleOption$
+    ).pipe(
+      withLatestFrom(typhoonScheduleOptionDict$),
+      map(([[typhoon, schedule], dict]) => {
+        return dict[typhoon][schedule];
       }),
-      shareReplay(1)
+      filter(selecteTyphoonSchedule => !_isEmpty(selecteTyphoonSchedule))
     );
+
+    const typhoonSpeed$ = currentSelectedTyphoonSchedule$.pipe(
+      map(opt => opt.tphn_spd)
+    );
+
+    const quayMooringInfoParam$ = currentSelectedTyphoonSchedule$.pipe(
+      map(selectedTyphoonOption => {
+        return `${selectedTyphoonOption.year}_${selectedTyphoonOption.tphn_no}`;
+      })
+    );
+
+    quayMooringInfoParam$.subscribe(param => {
+      this.store.dispatch(
+        new QuayMooringInfoActions.FetchQuayMooringInfos(param)
+      );
+    });
 
     this.typhoonSpeed$ = typhoonSpeed$;
     this.yearOptions$ = yearOptions$;
     this.typhoonOptions$ = typhoonOptions$;
     this.schedulesOptions$ = scheduleOptions$;
-    this.quayMooringSchedules$ = currentQuayMooringSchedule$;
   }
 }

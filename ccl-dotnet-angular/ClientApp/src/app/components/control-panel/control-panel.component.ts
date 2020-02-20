@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
-export interface TyphoonOption {
-  year: string;
-  tphn_spd: number;
-  tphn_no: string;
-  tphn_name: string;
-}
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 
 @Component({
   selector: 'app-control-panel',
@@ -16,11 +15,11 @@ export interface TyphoonOption {
 export class ControlPanelComponent {
   @Input() typhoonSpeed = 0;
   @Input() years: string[];
-  @Input() typhoons: TyphoonOption[];
+  @Input() typhoons: string[];
   @Input() schedules: string[] = [];
 
   @Output() yearChange = new EventEmitter<string>();
-  @Output() typhoonChange = new EventEmitter<TyphoonOption>();
+  @Output() typhoonChange = new EventEmitter<string>();
   @Output() scheduleChange = new EventEmitter<string>();
 
   changeYear(year: string): void {
@@ -28,11 +27,7 @@ export class ControlPanelComponent {
   }
 
   changeTyphoon(tphn_no: string): void {
-    const selectedTyphoon = this.typhoons.filter(
-      typhoon => typhoon.tphn_no === tphn_no
-    )[0];
-    this.typhoonSpeed = selectedTyphoon.tphn_spd;
-    this.typhoonChange.emit(selectedTyphoon);
+    this.typhoonChange.emit(tphn_no);
   }
 
   changeSchdule(schedule: string): void {

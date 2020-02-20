@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { fabric } from 'fabric';
 import { Canvas, IEvent, IPathOptions } from 'fabric/fabric-impl';
 import _countBy from 'lodash/countBy';
@@ -10,11 +17,31 @@ import _isUndefined from 'lodash/isUndefined';
 import _keyBy from 'lodash/keyBy';
 import _mapValues from 'lodash/mapValues';
 import _range from 'lodash/range';
-import { combineLatest, fromEvent, merge, Observable, ReplaySubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs/operators';
+import {
+  combineLatest,
+  fromEvent,
+  merge,
+  Observable,
+  ReplaySubject,
+  Subject
+} from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  shareReplay,
+  startWith
+} from 'rxjs/operators';
 import { QuayMooringInfo } from 'src/shared/serverModel.interface.js';
-import { Coordinate, GroupStyle, LandScapeClass, Road } from 'src/shared/shipyard.interface';
+import {
+  Coordinate,
+  GroupStyle,
+  LandScapeClass,
+  Road
+} from 'src/shared/shipyard.interface';
 import quays from '../../../assets/json/quays.json';
+import { QuayMooringInfoState } from 'src/store/quayMooringInfo.state';
+import { Select } from '@ngxs/store';
 
 export interface QuayOriginInfo {
   originX: number;
@@ -89,6 +116,9 @@ const CODE_RED = '#ff0000';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CanvasComponent implements OnInit {
+  @Select(QuayMooringInfoState.quayMooringInfos)
+  quayMooringInfos$: Observable<QuayMooringInfo[]>;
+
   @ViewChild('popup', { static: false }) popup: ElementRef<HTMLDivElement>;
 
   @Input() maxZoomLevel: number;
@@ -102,7 +132,6 @@ export class CanvasComponent implements OnInit {
   @Input() quayNames: CanvasInput<LandScapeClass[]>;
 
   @Input() typhoonSpeed: number;
-  @Input() quayMooringSchedules$: Observable<QuayMooringInfo[]>;
 
   MOST_INNER_X = 171659.5794;
   MOST_INNER_Y = 251671.8693;
@@ -185,27 +214,23 @@ export class CanvasComponent implements OnInit {
       startWith([INITIAL_WIDTH, INITIAL_HEIGHT])
     );
 
-    merge(
-      this.zoomButtonClickEvent,
-      this.panButtonClickEvent
-    ).subscribe(isZoom => {
-      const zoom = this.fabricCanvas.getZoom();
-      const modified = (() => {
-        if (isZoom) {
-          const z = zoom + 0.2;
-          return z > this.maxZoomLevel ? this.maxZoomLevel : z;
-        } else if (!isZoom) {
-          const z = zoom - 0.2;
-          return z < this.minZoomLevel ? this.minZoomLevel : z;
-        }
-      })();
-      this.fabricCanvas.zoomToPoint(
-        this.currentCenterPointer,
-        modified
-      );
-    });
+    merge(this.zoomButtonClickEvent, this.panButtonClickEvent).subscribe(
+      isZoom => {
+        const zoom = this.fabricCanvas.getZoom();
+        const modified = (() => {
+          if (isZoom) {
+            const z = zoom + 0.2;
+            return z > this.maxZoomLevel ? this.maxZoomLevel : z;
+          } else if (!isZoom) {
+            const z = zoom - 0.2;
+            return z < this.minZoomLevel ? this.minZoomLevel : z;
+          }
+        })();
+        this.fabricCanvas.zoomToPoint(this.currentCenterPointer, modified);
+      }
+    );
 
-    const quayMooringResult$ = this.quayMooringSchedules$.pipe(
+    const quayMooringResult$ = this.quayMooringInfos$.pipe(
       map<QuayMooringInfo[], QuayMooringResult>(schedules => {
         if (_isUndefined(schedules)) {
           return {
@@ -241,7 +266,7 @@ export class CanvasComponent implements OnInit {
 
     this.quayMooringResult$ = quayMooringResult$;
 
-    combineLatest([windowResizeEvent$, this.quayMooringSchedules$]).subscribe(
+    combineLatest([windowResizeEvent$, this.quayMooringInfos$]).subscribe(
       ([[screenWidth, screenHeight], quayMooringSchedules]) => {
         const canvasWidth = screenWidth;
         const canvasHeight = screenHeight;
@@ -676,13 +701,14 @@ export class CanvasComponent implements OnInit {
             selectable: true,
             hasBorders: false,
             hasControls: false,
-            angle: -39.5,
+            angle: -39.5
           }
         );
 
         const mapWidth = groupOfBackgroundMap.width * this.minZoomLevel;
         const mapHeight = groupOfBackgroundMap.height * this.minZoomLevel;
-        const withOffset = Math.sqrt(Math.pow(mapWidth, 2) + Math.pow(mapHeight, 2)) * 1.05;
+        const withOffset =
+          Math.sqrt(Math.pow(mapWidth, 2) + Math.pow(mapHeight, 2)) * 1.05;
 
         groupOfBackgroundMap.set({
           left: (canvasWidth - withOffset) / 2,
@@ -792,20 +818,29 @@ export class CanvasComponent implements OnInit {
                 }
               })();
 
-              const getClassByWindSpeed = (speed: number, typhoonSpeed: number) => {
+              const getClassByWindSpeed = (
+                speed: number,
+                typhoonSpeed: number
+              ) => {
                 return speed < typhoonSpeed ? 'code-red' : 'code-green';
-              }
+              };
 
               return {
                 quayName: quayName,
                 quayDesc: quayDesc,
                 projNum: proj_no,
                 realWindSpeed: real_wdsp || '-',
-                realWindClass: !real_wdsp ? 'code-none' : getClassByWindSpeed(real_wdsp, this.typhoonSpeed),
+                realWindClass: !real_wdsp
+                  ? 'code-none'
+                  : getClassByWindSpeed(real_wdsp, this.typhoonSpeed),
                 maxWindSpeed: max_wdsp || '-',
-                maxWindClass: !max_wdsp ? 'code-none' : getClassByWindSpeed(max_wdsp, this.typhoonSpeed),
+                maxWindClass: !max_wdsp
+                  ? 'code-none'
+                  : getClassByWindSpeed(max_wdsp, this.typhoonSpeed),
                 satisfiedWindSpeed: sfty_wdsp || '-',
-                satisfiedWindClass: !sfty_wdsp ? 'code-none' : getClassByWindSpeed(sfty_wdsp, this.typhoonSpeed),
+                satisfiedWindClass: !sfty_wdsp
+                  ? 'code-none'
+                  : getClassByWindSpeed(sfty_wdsp, this.typhoonSpeed),
                 realMoorDrawing: real_moor_dwg,
                 maxMoorDrawing: max_moor_dwg,
                 satisfiedMoorDrawing: sfty_moor_dwg

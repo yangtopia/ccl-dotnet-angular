@@ -7,7 +7,12 @@
     <div class="card-header">
       <div class="controls-wrap">
         <div class="typhoon-info">
-          <clr-icon shape="cloud" size="24"></clr-icon>
+          <img
+            src="assets/images/icons8-wind-100.png"
+            alt="typhoon"
+            width="24px"
+            height="24px"
+          />
           <div style="margin-left: 5px;">
             태풍 기준풍속 :
             <span style="font-weight: bold;">{{ typhoonSpeed }}</span
@@ -26,9 +31,9 @@
           <clr-select-container>
             <label>태풍정보</label>
             <select clrSelect (change)="changeTyphoon($event.target.value)">
-              <option *ngFor="let typhoon of typhoons" [value]="typhoon.tphn_no"
-                >{{ typhoon.tphn_no }}호 {{ typhoon.tphn_name }}</option
-              >
+              <option *ngFor="let typhoon of typhoons" [value]="typhoon">{{
+                typhoon
+              }}</option>
             </select>
           </clr-select-container>
           <clr-select-container>
@@ -43,45 +48,5 @@
         </div>
       </div>
     </div>
-    <!--
-    <div class="card-block">
-      <div class="card-title">
-        <clr-icon shape="cloud" size="24"></clr-icon>
-        태풍 기준풍속
-      </div>
-      <div class="card-text">{{ typhoonSpeed }}m/s (10분 평균)</div>
-      <div class="card-title">
-        <clr-icon shape="calendar" size="24"></clr-icon>
-        계류일정
-      </div>
-      <div class="card-text select-controls">
-        <clr-select-container>
-          <label>년도</label>
-          <select clrSelect (change)="changeYear($event.target.value)">
-            <option *ngFor="let year of years" [value]="year">{{
-              year
-            }}</option>
-          </select>
-        </clr-select-container>
-        <clr-select-container>
-          <label>태풍정보</label>
-          <select clrSelect (change)="changeTyphoon($event.target.value)">
-            <option *ngFor="let typhoon of typhoons" [value]="typhoon.tphn_no"
-              >{{ typhoon.tphn_no }}호 {{ typhoon.tphn_name }}</option
-            >
-          </select>
-        </clr-select-container>
-        <clr-select-container>
-          <label>일정</label>
-          <select clrSelect (change)="changeSchdule($event.target.value)">
-            <option *ngIf="schedules.length === 0">일정없음</option>
-            <option *ngFor="let schedule of schedules" [value]="schedule">{{
-              schedule
-            }}</option>
-          </select>
-        </clr-select-container>
-      </div>
-    </div>
-    -->
   </div>
 </div>
