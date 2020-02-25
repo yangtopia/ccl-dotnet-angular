@@ -18,7 +18,7 @@ export interface QUAY_MOORING_INFO {
   REVISION: number;
   QUAY_ID: string;
   PROJ_NO: number;
-  ALONGSIDE: 'Stbd' | 'Port';
+  ALONGSIDE: '0' | '1';
   REAL_SPEED: number;
   REAL_DRAWING: string;
   MAX_SPEED?: number;

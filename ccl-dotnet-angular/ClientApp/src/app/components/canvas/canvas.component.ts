@@ -68,7 +68,7 @@ export interface QuayInfo {
     numSize?: number;
   }[];
   projNum?: string;
-  alongside?: 'Stbd' | 'Port';
+  alongside?: '0' | '1';
   mooringStatus?: 'GREEN' | 'ORANGE' | 'RED';
 }
 
@@ -599,7 +599,7 @@ export class CanvasComponent implements OnInit {
 
             const {
               quayName,
-              alongside = 'Port',
+              alongside = '0',
               projNum = '0000',
               isVertical = false,
               isRightSide = false,
@@ -610,7 +610,7 @@ export class CanvasComponent implements OnInit {
 
             const shipObjects = (() => {
               const addtionalOption = (() => {
-                const isAlongsidePort = alongside === 'Port';
+                const isAlongsidePort = alongside === '0';
                 if (!isVertical && !isRightSide) {
                   return {
                     flipX: isAlongsidePort

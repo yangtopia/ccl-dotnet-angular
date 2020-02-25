@@ -60,14 +60,14 @@ export interface QuayInfo {
  * @property {number} rev_numb  revision
  * @property {string} quay_name 안벽 명칭
  * @property {string} proj_no 공사번호
- * @property {string} alsd_dirt 접안방향
+ * @property {string} alsd_dirt 접안방향 (0: Port, 1: Stbd)
  * @property {number} real_wdsp 실제 풍속
  * @property {string} real_moor_dwg 실제 계류도면
  * @property {number} max_wdsp 최대풍속
  * @property {string} max_moor_dwg 최대계류도면
  * @property {number} sfty_wdsp 안전풍속
  * @property {string} sfty_moor_dwg 안전계류도면
- * @property {string} status 상태
+ * @property {string} status 상태 (0: 미정, 1: 완료, 2: 확정)
  * @property {string} updt_indc 수정여부
  * @property {string} rgsr_date 등록일자
  * @property {string} rgsr_time 등록시각
@@ -82,14 +82,14 @@ export interface QuayMooringInfo {
   rev_numb: number;
   quay_name: string;
   proj_no: string;
-  alsd_dirt?: string;
+  alsd_dirt?: '0' | '1';
   real_wdsp: number;
   real_moor_dwg?: string;
   max_wdsp: number;
   max_moor_dwg?: string;
   tphn_stfc: number;
   stfc_moor_dwg?: string;
-  status?: string;
+  status?: '0' | '1' | '2';
   updt_indc?: string;
   rgsr_date: string;
   rgsr_time: string;
