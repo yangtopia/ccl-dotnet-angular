@@ -75,7 +75,14 @@ namespace ccl_dotnet_angular.Repositories
 
     public IDbConnection GetConnection()
     {
-      var connectionString = configuration.GetSection("ConnectionStrings").GetSection("oracleConnection").Value;
+      var connectionInfos = configuration.GetSection("ConnectionInfos");
+      var HOST = connectionInfos.GetSection("host").Value;
+      var PORT = connectionInfos.GetSection("port").Value;
+      var SERVICE_NAME = connectionInfos.GetSection("serviceName").Value;
+      var USERNAME = connectionInfos.GetSection("userName").Value;
+      var PASSWORD = connectionInfos.GetSection("password").Value;
+
+      var connectionString = $"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={HOST})(PORT={PORT}))(CONNECT_DATA=(SERVICE_NAME={SERVICE_NAME})));User ID={USERNAME};Password={PASSWORD}";
       var conn = new OracleConnection(connectionString);
       return conn;
     }
