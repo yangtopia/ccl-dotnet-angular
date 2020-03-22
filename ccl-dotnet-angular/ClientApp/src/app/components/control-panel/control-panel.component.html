@@ -37,7 +37,7 @@
             </select>
           </clr-select-container>
           <clr-select-container>
-            <label>일정</label>
+            <label>리비전</label>
             <select clrSelect (change)="changeSchdule($event.target.value)">
               <option *ngIf="schedules.length === 0">일정없음</option>
               <option *ngFor="let schedule of schedules" [value]="schedule">{{

@@ -167,14 +167,14 @@ export class AppComponent implements OnInit {
     const typhoonScheduleOptionDict$ = typhoonInfosBySelectedYear$.pipe(
       map(infos => {
         const groupedTyphoonInfos = _groupBy(infos, info => {
-          return `${info.tphn_no.split('_')[0]}호_${info.tphn_name}`;
+          return `${info.tphn_no.split('_')[0]}호 ${info.tphn_name}`;
         });
         return _mapValues(groupedTyphoonInfos, infos => {
           return _mapKeys(infos, info => {
             const month = info.mnth_date.substr(0, 2);
             const date = info.mnth_date.substr(2, 2);
             const [_, revisionNumber] = info.tphn_no.split('_');
-            return `${month}-${date}-R${revisionNumber}`;
+            return `R${revisionNumber} ${month}${date}`;
           });
         });
       })
