@@ -34,7 +34,7 @@
     "core-js": "^2.6.10",
     "fabric": "^3.5.1",
     "jquery": "3.4.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "oidc-client": "^1.9.1",
     "popper.js": "^1.16.0",
